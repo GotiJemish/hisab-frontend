@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* variables */
+@import url(./variables/index.css);
+/* common class */
+@import url(./common/index.css);
