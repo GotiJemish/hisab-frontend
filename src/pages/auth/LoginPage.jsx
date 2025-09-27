@@ -4,14 +4,109 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputFieldj";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
+import { useLoading } from "@/context/LoadingContext";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon, GoogleIcon, XIcon } from "@/icons";
+import apiClient from "@/utilities/apiClients";
 import Link from "next/link";
 import React, { useState } from "react";
-
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const { showToast } = useToast();
+  const router = useRouter();
+  const { login } = useAuth();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  })
+
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const { loading, setLoading } = useLoading();
   const [isChecked, setIsChecked] = useState(false);
+  const validate = () => {
+    let valid = true;
+    const newErrors = { email: "", password: "" };
+
+    // Basic email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!emailRegex.test(form.email)) {
+      newErrors.email = "Invalid email format";
+      valid = false;
+    }
+
+    if (!form.password.trim()) {
+      newErrors.password = "Password is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Reset specific field error on change
+    setErrors((prev) => ({
+      ...prev,
+      [field]: "",
+    }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+
+    console.log("Form Submitted", form);
+    try {
+      setLoading(true);
+      setServerError("");
+      const response = await apiClient.post("/api/login", {
+        email: form?.email,
+        password: form?.password,
+      });
+      const { access, refresh, user_id } = response.data;
+      // Save access token to localStorage
+      localStorage.setItem("auth_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      // Save access token in cookie too (optional)
+      Cookies.set("auth_token", access, {
+        expires: 2, // 2 days
+        secure: true,
+        sameSite: "Lax",
+      });
+      showToast({ message: "Logged in successfully!", type: "success" });
+      login(res.data);
+      router.push(`/${user_id}`);
+      router.push("/dashboard");
+    } catch (error) {
+      showToast({ message: "Login failed", type: "error" });
+      if (apiClient.isAxiosError(error)) {
+        setServerError(error.response?.data?.message || "Login failed");
+      } else {
+        setServerError("Something went wrong");
+      }
+    }
+    finally {
+      setLoading(false);
+    }
+
+
+  };
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
@@ -55,11 +150,11 @@ const LoginPage = () => {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-6">
 
-                <AuthInput label="email" required type="email" name="email" controlId="email" onChange={() => { }} placeholder="Enter your email" />
-                <AuthInput label="password" required type="password" name="password" controlId="password" onChange={() => { }} placeholder="Enter your password" />
+                <AuthInput label="email" required type="email" name="email" controlId="email" onChange={(e) => { handleChange("email", e.target.value) }} placeholder="Enter your email" validation={{ error: !!errors.email, message: errors.email, }} />
+                <AuthInput label="password" required type="password" name="password" controlId="password" onChange={(e) => { handleChange("password", e.target.value) }} placeholder="Enter your password" validation={{ error: !!errors.password, message: errors?.password }} />
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -76,9 +171,9 @@ const LoginPage = () => {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm" type="submit" title="Sign in"/>
-                    
-                  
+                  <Button className="w-full" size="sm" type="submit" title="Sign in" />
+
+
                 </div>
               </div>
             </form>
@@ -87,7 +182,7 @@ const LoginPage = () => {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Don&apos;t have an account? {""}
                 <Link
-                  href="/signup"
+                  href="/register"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign Up

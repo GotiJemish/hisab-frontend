@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import Label from '../Label';
 import { EyeCloseIcon, EyeIcon } from '@/icons';
 
-const AuthInput = ({label="", type = "text", required = false, name = "", controlId = "",step=1, onChange = () => { }, defaultValue = "", placeholder = "", disabled = false, className = "", min = 0, max = 1000, message = "", error = false, success = false }) => {
+const AuthInput = ({label="", type = "text", required = false, name = "", controlId = "",step=1, onChange = () => { }, defaultValue = "", placeholder = "", disabled = false, className = "", min = 0, max = 1000, validation={}  }) => {
+    const{message = "", error = false, success = false}=validation;
     const [showPassword, setShowPassword] = useState(false);
      let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 
@@ -37,18 +38,7 @@ const AuthInput = ({label="", type = "text", required = false, name = "", contro
                 />
 
                 {/* Optional Hint Text */}
-                {message && (
-                    <p
-                        className={`mt-1.5 text-xs ${error
-                            ? "text-error-500"
-                            : success
-                                ? "text-success-500"
-                                : "text-gray-500"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
+                
 
 
                 {type === "password" && <span
@@ -63,6 +53,18 @@ const AuthInput = ({label="", type = "text", required = false, name = "", contro
                 </span>}
 
             </div>
+            {message && (
+                    <p
+                        className={`mt-1.5 text-xs ${error
+                            ? "text-error-500"
+                            : success
+                                ? "text-success-500"
+                                : "text-gray-500"
+                            }`}
+                    >
+                        {message}
+                    </p>
+                )}
         </div>
     )
 }

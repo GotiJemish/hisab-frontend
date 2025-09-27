@@ -2,6 +2,10 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { LoadingProvider } from '@/context/LoadingContext';
+import GlobalLoader from '@/components/common/GlobalLoader';
+import MainLayout from '@/layouts/MainLayout';
+import { ToastProvider } from '@/context/ToastContext';
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -17,7 +21,14 @@ export default function RootLayout({ children, pageProps }) {
      <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
         <ThemeProvider>
+           <ToastProvider>
+        <MainLayout>
+          <LoadingProvider>
+            <GlobalLoader/>
           <SidebarProvider>{children}</SidebarProvider>
+          </LoadingProvider>
+        </MainLayout>
+        </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
