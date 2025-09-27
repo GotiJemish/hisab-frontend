@@ -1,15 +1,9 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "@/styles/index.css"
-// import dynamic from 'next/dynamic';
-// const MainLayout = dynamic(() => import('@/layouts/main/MainLayout'));
+import { Outfit } from 'next/font/google';
+import './globals.css';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const outfit = Outfit({
   subsets: ["latin"],
 });
 
@@ -20,9 +14,11 @@ export const metadata = {
 
 export default function RootLayout({ children, pageProps }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased `}>
-        {children}
+     <html lang="en">
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+        <ThemeProvider>
+          <SidebarProvider>{children}</SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
