@@ -5,26 +5,24 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const ProtectedRoute = ({ children, fallback = null }) => {
-  const { isAuthenticated, accessToken } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    // If not authenticated, redirect to login
-    if (!isAuthenticated) {
-      router.push("/login");
+   useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
-  if (!isAuthenticated) {
-    // Optional fallback: could be a spinner or null
-    return fallback || (
+   if (isLoading) {
+    return (
       <div className="w-full h-screen flex items-center justify-center">
         <p className="text-gray-500 text-sm">Checking authentication...</p>
       </div>
     );
   }
 
-  return children;
+   return isAuthenticated ? children : null;
 };
 
 export default ProtectedRoute;

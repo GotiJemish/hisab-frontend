@@ -1,4 +1,4 @@
-import HomePage from '@/pages/homepage'
+import HomePage from '@/pages/user-dashboard'
 import React from 'react'
 
 const page = () => {

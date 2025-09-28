@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { handleApiError } from "@/utilities/functions";
 
 const LoginPage = () => {
   const { showToast } = useToast();
@@ -74,8 +75,8 @@ const LoginPage = () => {
     console.log("Form Submitted", form);
     try {
       setLoading(true);
-      setServerError("");
-      const response = await apiClient.post("/api/login", {
+
+      const response = await apiClient.post("/auth/login/", {
         email: form?.email,
         password: form?.password,
       });
@@ -83,6 +84,7 @@ const LoginPage = () => {
       // Save access token to localStorage
       localStorage.setItem("auth_token", access);
       localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem("user_id", user_id);
       // Save access token in cookie too (optional)
       Cookies.set("auth_token", access, {
         expires: 2, // 2 days
@@ -90,16 +92,11 @@ const LoginPage = () => {
         sameSite: "Lax",
       });
       showToast({ message: "Logged in successfully!", type: "success" });
-      login(res.data);
+      login({ access, refresh }); 
       router.push(`/${user_id}`);
-      router.push("/dashboard");
     } catch (error) {
+      handleApiError(error, "Login failed");
       showToast({ message: "Login failed", type: "error" });
-      if (apiClient.isAxiosError(error)) {
-        setServerError(error.response?.data?.message || "Login failed");
-      } else {
-        setServerError("Something went wrong");
-      }
     }
     finally {
       setLoading(false);

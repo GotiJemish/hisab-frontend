@@ -6,6 +6,7 @@ import { LoadingProvider } from '@/context/LoadingContext';
 import GlobalLoader from '@/components/common/GlobalLoader';
 import MainLayout from '@/layouts/MainLayout';
 import { ToastProvider } from '@/context/ToastContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -20,6 +21,7 @@ export default function RootLayout({ children, pageProps }) {
   return (
      <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
+         <AuthProvider>
         <ThemeProvider>
            <ToastProvider>
         <MainLayout>
@@ -30,6 +32,7 @@ export default function RootLayout({ children, pageProps }) {
         </MainLayout>
         </ToastProvider>
         </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

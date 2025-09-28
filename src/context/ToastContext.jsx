@@ -2,16 +2,17 @@
 
 import Alert from "@/components/ui/alert/Alert";
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 const MAX_VISIBLE_TOASTS = 4;
-const FADE_OUT_DURATION = 300; 
+const FADE_OUT_DURATION = 300;
 const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
- const [toasts, setToasts] = useState([]);
+  const [toasts, setToasts] = useState([]);
 
-   const showToast = useCallback(({ message, type = "info", duration = 3000 }) => {
+  const showToast = useCallback(({ message, type = "info", duration = 3000 }) => {
     const id = uuidv4();
-    
+
     const newToast = { id, message, type, isRemoving: false };
 
     setToasts((prev) => {
@@ -28,7 +29,8 @@ export const ToastProvider = ({ children }) => {
       }
     });
 
-    // Auto remove this toast after `duration`
+
+    // Remove after specified duration
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, duration);
@@ -51,17 +53,25 @@ export const ToastProvider = ({ children }) => {
       prev.map((t) => (t.id === id ? { ...t, isRemoving: true } : t))
     );
   };
-    return (
-        <ToastContext.Provider value={{ showToast }}>
-            {children}
-             <div className="fixed top-5 right-5 z-50 flex flex-col gap-3 items-end">
-{toasts.map((toast) => (
-                <Alert key={toast.id} variant={toast?.type} message={toast?.message} showLink={false} linkHref="#" linkText="Learn more" closeToast={() => closeToast(toast.id)}/>
-              ))}
-             </div>
-          
+  return (
+    <ToastContext.Provider value={{ showToast }}>
+      {children}
+      <div className="fixed top-5 right-5 z-50 flex flex-col gap-3 items-end">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`transition-opacity duration-300 ${
+              toast.isRemoving ? "opacity-0" : "animate-toast-in"
+            }`}
+          >
+          <Alert variant={toast?.type} message={toast?.message} showLink={false} linkHref="#" linkText="Learn more" closeToast={() => closeToast(toast.id)} />
+        </div>
+        ))}
 
-                 <style jsx global>{`
+      </div>
+
+
+       <style jsx global>{`
         @keyframes toast-in {
           0% {
             opacity: 0;
@@ -77,8 +87,8 @@ export const ToastProvider = ({ children }) => {
           animation: toast-in 0.3s ease-out forwards;
         }
       `}</style>
-        </ToastContext.Provider>
-    );
+    </ToastContext.Provider>
+  );
 };
 
 
