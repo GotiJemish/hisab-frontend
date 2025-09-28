@@ -1,9 +1,14 @@
+import RegisterPage from '@/pages/auth/RegisterPage'
 import React from 'react'
-
+export const metadata = {
+  title: "Next.js SignUp Page | TailAdmin - Next.js Dashboard Template",
+  description: "This is Next.js SignUp Page TailAdmin Dashboard Template",
+  // other metadata
+};
 const page = () => {
   return (
     <div>
-      register
+     <RegisterPage/>
     </div>
   )
 }

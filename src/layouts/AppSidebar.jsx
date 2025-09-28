@@ -18,9 +18,18 @@ import {
   UserCircleIcon,
 } from "@/icons";
 import SidebarWidget from "./SidebarWidget";
+import { useUserPath } from "@/utilities/functions";
 
 
 
+const AppSidebar = () => {
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const pathname = usePathname();
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [subMenuHeight, setSubMenuHeight] = useState({});
+  const subMenuRefs = useRef({});
+   const isActive = useCallback((path) => path === pathname, [pathname]);
+  const userPath = useUserPath();
 const navItems= [
   {
     icon: <GridIcon />,
@@ -89,15 +98,6 @@ const othersItems = [
   },
 ];
 
-const AppSidebar = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
-  const pathname = usePathname();
-  const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [subMenuHeight, setSubMenuHeight] = useState({});
-  const subMenuRefs = useRef({});
-   const isActive = useCallback((path) => path === pathname, [pathname]);
-
-
 
 
 
@@ -158,7 +158,7 @@ const AppSidebar = () => {
           ) : (
             nav.path && (
               <Link
-                href={nav.path}
+                href={userPath(nav.path)}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                 }`}
@@ -195,7 +195,7 @@ const AppSidebar = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      href={subItem.path}
+                      href={userPath(subItem.path)}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
@@ -298,7 +298,7 @@ const AppSidebar = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
+        <Link href={userPath("/")}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image

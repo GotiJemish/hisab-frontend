@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 export const handleApiError = (error, fallbackMessage = "Something went wrong") => {
   if (axios.isAxiosError(error)) {
@@ -6,4 +7,10 @@ export const handleApiError = (error, fallbackMessage = "Something went wrong") 
   }
 
   return fallbackMessage;
+};
+
+export const useUserPath = () => {
+  const { user } = useAuth();
+
+  return (path = "") => `/${user?.user_id}${path}`;
 };

@@ -84,7 +84,7 @@ const LoginPage = () => {
       // Save access token to localStorage
       localStorage.setItem("auth_token", access);
       localStorage.setItem("refresh_token", refresh);
-      localStorage.setItem("user_id", user_id);
+      // localStorage.setItem("user_id", user_id);
       // Save access token in cookie too (optional)
       Cookies.set("auth_token", access, {
         expires: 2, // 2 days
@@ -92,7 +92,7 @@ const LoginPage = () => {
         sameSite: "Lax",
       });
       showToast({ message: "Logged in successfully!", type: "success" });
-      login({ access, refresh }); 
+      login({ access, refresh,userId:user_id }); 
       router.push(`/${user_id}`);
     } catch (error) {
       handleApiError(error, "Login failed");

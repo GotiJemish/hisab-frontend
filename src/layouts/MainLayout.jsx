@@ -13,12 +13,10 @@ const MainLayout = ({ children }) => {
      const cookieToken = Cookies.get("auth_token");
     const localToken = localStorage.getItem("auth_token");
 
-
     // Only proceed if there's a token in cookies and not in localStorage
     if (cookieToken && !localToken) {
       try {
         const decoded = jwtDecode(cookieToken);
-
         const isExpired = decoded?.exp ? Date.now() >= decoded.exp * 1000 : false;
 
         if (!isExpired) {
@@ -26,11 +24,13 @@ const MainLayout = ({ children }) => {
           console.log("Valid token restored to localStorage from cookie.");
         } else {
           Cookies.remove("auth_token");
+          Cookies.remove("user_id");
           console.log("Expired token removed from cookies.");
         }
       } catch (err) {
         console.error("Invalid token found in cookie:", err);
         Cookies.remove("auth_token");
+        Cookies.remove("user_id");
       }
     }
   }, []);
