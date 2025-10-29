@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
-import Input from "../input/InputFieldj.jsx";
+import Input from "../input/InputField.jsx";
 import Label from "../Label";
 
 export default function InputStates() {

@@ -1,7 +1,7 @@
 "use client";
 import AuthInput from "@/components/form/input/AuthInput";
 import Checkbox from "@/components/form/input/Checkbox";
-import Input from "@/components/form/input/InputFieldj";
+import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { useLoading } from "@/context/LoadingContext";
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { handleApiError } from "@/utilities/functions";
+import { validateEmail, validateRequired } from "@/utilities/validations";
 
 const LoginPage = () => {
   const { showToast } = useToast();
@@ -31,27 +32,36 @@ const LoginPage = () => {
   const { loading, setLoading } = useLoading();
   const [isChecked, setIsChecked] = useState(false);
   const validate = () => {
-    let valid = true;
-    const newErrors = { email: "", password: "" };
+    // let valid = true;
+    // const newErrors = { email: "", password: "" };
 
     // Basic email regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!form.email.trim()) {
-      newErrors.email = "Email is required";
-      valid = false;
-    } else if (!emailRegex.test(form.email)) {
-      newErrors.email = "Invalid email format";
-      valid = false;
-    }
+    // if (!form.email.trim()) {
+    //   newErrors.email = "Email is required";
+    //   valid = false;
+    // } else if (!emailRegex.test(form.email)) {
+    //   newErrors.email = "Invalid email format";
+    //   valid = false;
+    // }
 
-    if (!form.password.trim()) {
-      newErrors.password = "Password is required";
-      valid = false;
-    }
+    // if (!form.password.trim()) {
+    //   newErrors.password = "Password is required";
+    //   valid = false;
+    // }
+
+
+ const newErrors = {
+      email: validateEmail(form.email),
+      password: validateRequired(form.password, "Password"),
+    };
+
+
 
     setErrors(newErrors);
-    return valid;
+     // Return true only if no errors
+    return !Object.values(newErrors).some((error) => error !== null);
   };
 
 
@@ -169,8 +179,6 @@ const LoginPage = () => {
                 </div>
                 <div>
                   <Button className="w-full" size="sm" type="submit" title="Sign in" />
-
-
                 </div>
               </div>
             </form>

@@ -53,7 +53,8 @@ export default function AdminLayout({children,id}) {
         {/* Header */}
         <AppHeader />
         {/* Page Content */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        {/* mx-auto max-w-(--breakpoint-2xl) */}
+        <div className="p-4 relative md:p-6">{children}</div>
       </div>
     </div>
     </ProtectedRoute>

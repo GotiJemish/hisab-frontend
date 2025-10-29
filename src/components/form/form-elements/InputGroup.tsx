@@ -2,7 +2,7 @@
 import React from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
-import Input from "../input/InputFieldj.jsx";
+import Input from "../input/InputField.jsx";
 import { EnvelopeIcon } from "../../../icons";
 import PhoneInput from "../group-input/PhoneInput";
 
