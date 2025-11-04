@@ -77,43 +77,48 @@ const LoginPage = () => {
       [field]: "",
     }));
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
 
+  try {
+    setLoading(true);
 
-    console.log("Form Submitted", form);
-    try {
-      setLoading(true);
+    // ✅ Correct backend URL and payload
+    const response = await apiClient.post("/auth/login/", {
+      email: form.email,
+      password: form.password,
+    });
 
-      const response = await apiClient.post("/auth/login/", {
-        email: form?.email,
-        password: form?.password,
-      });
-      const { access, refresh, user_id } = response.data;
-      // Save access token to localStorage
-      localStorage.setItem("auth_token", access);
-      localStorage.setItem("refresh_token", refresh);
-      // localStorage.setItem("user_id", user_id);
-      // Save access token in cookie too (optional)
-      Cookies.set("auth_token", access, {
-        expires: 2, // 2 days
-        secure: true,
-        sameSite: "Lax",
-      });
-      showToast({ message: "Logged in successfully!", type: "success" });
-      login({ access, refresh,userId:user_id }); 
-      router.push(`/${user_id}`);
-    } catch (error) {
-      handleApiError(error, "Login failed");
-      showToast({ message: "Login failed", type: "error" });
-    }
-    finally {
-      setLoading(false);
-    }
+    // ✅ Destructure tokens & user_id from response
+    const { access, refresh, user_id } = response.data;
 
+    // ✅ Store tokens locally
+    localStorage.setItem("auth_token", access);
+    localStorage.setItem("refresh_token", refresh);
+    Cookies.set("auth_token", access, {
+      expires: isChecked ? 7 : 2, // if "keep me logged in" checked → 7 days
+      secure: true,
+      sameSite: "Lax",
+    });
 
-  };
+    // ✅ Trigger auth context
+    login({ access, refresh, userId: user_id });
+
+    // ✅ Toast & redirect
+    showToast({ message: "Logged in successfully!", type: "success" });
+    router.push(`/dashboard/${user_id}`); // optional dynamic route
+  } catch (error) {
+    handleApiError(error, "Login failed");
+    showToast({
+      message: error?.response?.data?.detail || "Login failed",
+      type: "error",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">

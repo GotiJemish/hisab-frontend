@@ -43,8 +43,8 @@ const ForgotPassword = () => {
           message: "Password reset link sent to your email.",
           type: "success",
         });
-        localStorage.setItem("resetEmail",email);
-        router.push("/otp-verify");
+        localStorage.setItem("forgetPasswordEmail",email);
+        router.push("/otp-verify?userType=forgetPassword");
       } else {
         showToast({
           message: response?.data?.message || "Failed to send reset link.",
