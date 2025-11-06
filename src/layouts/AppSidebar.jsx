@@ -8,6 +8,7 @@ import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
+  ContactIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -35,6 +36,11 @@ const navItems= [
     icon: <GridIcon />,
     name: "Dashboard",
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+  },
+   {
+    icon: <ContactIcon />,
+    name: "Contact",
+    path: "/contacts",
   },
   {
     icon: <CalenderIcon />,
@@ -118,7 +124,7 @@ const othersItems = [
   const renderMenuItems = ( navItems, menuType) => (
     <ul className="flex flex-col gap-4">
       {navItems.map((nav, index) => (
-        <li key={nav.name}>
+        <li key={index} >
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}

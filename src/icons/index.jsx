@@ -379,6 +379,23 @@ const CalenderIcon = (props) => (
     />
   </svg>
 );
+const ContactIcon = (props) => (
+  <svg
+    className="stroke-current"
+    width={24}
+    height={24}
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5.54488 11.7254L8.80112 10.056C8.94007 9.98476 9.071 9.89524 9.16639 9.77162C9.57731 9.23912 9.66722 8.51628 9.38366 7.89244L7.76239 4.32564C7.23243 3.15974 5.7011 2.88206 4.79552 3.78764L3.72733 4.85577C3.36125 5.22182 3.18191 5.73847 3.27376 6.24794C3.9012 9.72846 5.56003 13.0595 8.25026 15.7497C10.9405 18.44 14.2716 20.0988 17.7521 20.7262C18.2615 20.8181 18.7782 20.6388 19.1442 20.2727L20.2124 19.2045C21.118 18.2989 20.8403 16.7676 19.6744 16.2377L16.1076 14.6164C15.4838 14.3328 14.7609 14.4227 14.2284 14.8336C14.1048 14.929 14.0153 15.06 13.944 15.1989L12.2747 18.4552"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+  </svg>
+);
 const ChevronDownIcon = (props) => (
   <svg
     width={20}
@@ -596,8 +613,99 @@ const SignOutIcon = (props) => (
   </svg>
 );
 
-import PlusIcon from "./plus.svg";
-import CloseIcon from "./close.svg";
+const SearchIcon = (props) => (
+  <svg
+    className={props?.className}
+    width={20}
+    height={20}
+    {...props}
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+const DownloadIcon = (props) => (
+  <svg
+    className={props?.className}
+    width={24}
+    height={24}
+    {...props}
+    viewBox="0 0 25 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12.6686 16.75C12.4526 16.75 12.2579 16.6587 12.1211 16.5126L7.5115 11.9059C7.21851 11.6131 7.21836 11.1382 7.51116 10.8452C7.80396 10.5523 8.27883 10.5521 8.57182 10.8449L11.9186 14.1896V4C11.9186 3.58579 12.2544 3.25 12.6686 3.25C13.0828 3.25 13.4186 3.58579 13.4186 4V14.1854L16.7615 10.8449C17.0545 10.5521 17.5294 10.5523 17.8222 10.8453C18.115 11.1383 18.1148 11.6131 17.8218 11.9059L13.2469 16.4776C13.1093 16.644 12.9013 16.75 12.6686 16.75ZM5.41663 16C5.41663 15.5858 5.08084 15.25 4.66663 15.25C4.25241 15.25 3.91663 15.5858 3.91663 16V18.5C3.91663 19.7426 4.92399 20.75 6.16663 20.75H19.1675C20.4101 20.75 21.4175 19.7426 21.4175 18.5V16C21.4175 15.5858 21.0817 15.25 20.6675 15.25C20.2533 15.25 19.9175 15.5858 19.9175 16V18.5C19.9175 18.9142 19.5817 19.25 19.1675 19.25H6.16663C5.75241 19.25 5.41663 18.9142 5.41663 18.5V16Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+const ThreeDotIcon = (props) => (
+  <svg
+    className={props?.className}
+    width={24}
+    height={24}
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M5.99902 10.245C6.96552 10.245 7.74902 11.0285 7.74902 11.995V12.005C7.74902 12.9715 6.96552 13.755 5.99902 13.755C5.03253 13.755 4.24902 12.9715 4.24902 12.005V11.995C4.24902 11.0285 5.03253 10.245 5.99902 10.245ZM17.999 10.245C18.9655 10.245 19.749 11.0285 19.749 11.995V12.005C19.749 12.9715 18.9655 13.755 17.999 13.755C17.0325 13.755 16.249 12.9715 16.249 12.005V11.995C16.249 11.0285 17.0325 10.245 17.999 10.245ZM13.749 11.995C13.749 11.0285 12.9655 10.245 11.999 10.245C11.0325 10.245 10.249 11.0285 10.249 11.995V12.005C10.249 12.9715 11.0325 13.755 11.999 13.755C12.9655 13.755 13.749 12.9715 13.749 12.005V11.995Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+const CloseIcon = (props) => (
+  <svg
+    className={props?.className}
+    width={24}
+    height={24}
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+const PlusIcon = (props) => (
+  <svg
+   className={props?.className}
+    width={12}
+    height={12}
+    {...props}
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M5.25012 3C5.25012 2.58579 5.58591 2.25 6.00012 2.25C6.41433 2.25 6.75012 2.58579 6.75012 3V5.25012L9.00034 5.25012C9.41455 5.25012 9.75034 5.58591 9.75034 6.00012C9.75034 6.41433 9.41455 6.75012 9.00034 6.75012H6.75012V9.00034C6.75012 9.41455 6.41433 9.75034 6.00012 9.75034C5.58591 9.75034 5.25012 9.41455 5.25012 9.00034L5.25012 6.75012H3C2.58579 6.75012 2.25 6.41433 2.25 6.00012C2.25 5.58591 2.58579 5.25012 3 5.25012H5.25012V3Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 import BoxIcon from "./box.svg";
 import CheckCircleIcon from "./check-circle.svg";
 
@@ -607,7 +715,6 @@ import BoltIcon from "./bolt.svg";
 import FolderIcon from "./folder.svg";
 
 import FileIcon from "./file.svg";
-import DownloadIcon from "./download.svg";
 import ArrowRightIcon from "./arrow-right.svg";
 
 import ShootingStarIcon from "./shooting-star.svg";
@@ -616,7 +723,7 @@ import TrashBinIcon from "./trash.svg";
 
 import PencilIcon from "./pencil.svg";
 import CheckLineIcon from "./check-line.svg";
-import CloseLineIcon from "./close-line.svg";
+
 import ChevronUpIcon from "./chevron-up.svg";
 
 import LockIcon from "./lock.svg";
@@ -651,6 +758,7 @@ export {
   AlertWarning,
   XIcon,
   AlertError,
+  SearchIcon,
   AlertInfo,
   ErrorIcon,
   ArrowUpIcon,
@@ -666,7 +774,6 @@ export {
   AngleDownIcon,
   PencilIcon,
   CheckLineIcon,
-  CloseLineIcon,
   ChevronDownIcon,
   PaperPlaneIcon,
   EnvelopeIcon,
@@ -676,6 +783,7 @@ export {
   EyeIcon,
   EyeCloseIcon,
   TimeIcon,
+  ContactIcon,
   CopyIcon,
   ChevronLeftIcon,
   SunIcon,
@@ -687,6 +795,7 @@ export {
   TaskIcon,
   PieChartIcon,
   BoxCubeIcon,
+  ThreeDotIcon,
   PlugInIcon,
   DocsIcon,
   MailIcon,

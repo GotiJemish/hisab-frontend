@@ -42,9 +42,9 @@ const NewPassword = () => {
 
     try {
       setLoading(true);
-      const email = localStorage.getItem("resetEmail");
-      const payload = { email, new_password:password };
-      const res = await apiClient.post("auth/reset-password/", payload);
+      const email = localStorage.getItem("registerEmail");
+      const payload = { email, password };
+      const res = await apiClient.post("auth/set-password/", payload);
       if (res?.status === 200) {
         showToast({ message: "Password reset successfully.", type: "success" });
         // cleanup

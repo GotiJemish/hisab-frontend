@@ -107,7 +107,7 @@ const handleSubmit = async (e) => {
 
     // ✅ Toast & redirect
     showToast({ message: "Logged in successfully!", type: "success" });
-    router.push(`/dashboard/${user_id}`); // optional dynamic route
+    router.push(`/${user_id}/dashboard`); // optional dynamic route
   } catch (error) {
     handleApiError(error, "Login failed");
     showToast({
