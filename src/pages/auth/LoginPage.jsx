@@ -89,9 +89,8 @@ const handleSubmit = async (e) => {
       email: form.email,
       password: form.password,
     });
-
     // ✅ Destructure tokens & user_id from response
-    const { access, refresh, user_id } = response.data;
+    const { access, refresh, user_id } = response.data.data;
 
     // ✅ Store tokens locally
     localStorage.setItem("auth_token", access);

@@ -3,56 +3,55 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import React, { useEffect, useRef, useState } from "react";
 import MainTable from "@/components/common/main-table/MainTable";
 import { useModal } from "@/hooks/useModal";
-import Modal from "@/components/ui/modal";
 import ContactModal from "@/components/modals/ContactModal";
 import Button from "@/components/ui/button/Button";
 import { PlusIcon } from "@/icons";
+import { getAllContacts } from "@/apis/contacts";
+import { useLoading } from "@/context/LoadingContext";
+import { useToast } from "@/context/ToastContext";
 
 const ContactsModule = () => {
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [eventTitle, setEventTitle] = useState("");
   const { isOpen, openModal, closeModal } = useModal();
-  const [eventStartDate, setEventStartDate] = useState("");
-  const [eventEndDate, setEventEndDate] = useState("");
-  const [eventLevel, setEventLevel] = useState("");
-
-
-  const handleAddOrUpdateEvent = () => {
-    if (selectedEvent) {
-      // Update existing event
-    
-    } else {
-      // Add new event
-      const newEvent = {
-        id: Date.now().toString(),
-        title: eventTitle,
-        start: eventStartDate,
-        end: eventEndDate,
-        allDay: true,
-        extendedProps: { calendar: eventLevel },
-      };
-     
+    const { showToast } = useToast();
+  const { loading, setLoading } = useLoading();
+  const [contacts, setContacts] = useState([
+    {
+        "id": 35,
+        "name": "1",
+        "mobile": "8849853373",
+        "email": "gja5364@gmail.com",
+        "pan": "qqqqqqqqqq",
+        "gst": "qqqqqqqqqqqqqqq",
+        "billing_address": "asdas",
+        "shipping_address": "asfasa",
+        "city": "asda",
+        "state": "asda",
+        "country": "India",
+        "pincode": "148545",
+        "notes": "asdad",
+        "created_at": "2025-11-07T16:10:16.450208Z",
+        "updated_at": "2025-11-07T16:10:16.450236Z",
+        "user": "47c84493-ddb9-43b3-b659-370909eea472"
     }
-    closeModal();
-    resetModalFields();
-  };
-  const resetModalFields = () => {
-    setEventTitle("");
-    setEventStartDate("");
-    setEventEndDate("");
-    setEventLevel("");
-    setSelectedEvent(null);
-  };
-  const calendarsEvents = {
-    Danger: "danger",
-    Success: "success",
-    Primary: "primary",
-    Warning: "warning",
-  };
+]);
 
   useEffect(() => {
-    // Initialize with some events
-  
+    const fetchContacts = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllContacts();
+        setContacts(data);
+      } catch (error) {
+        showToast({
+          message: "Failed to fetch contacts.",
+          type: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContacts();
   }, []);
   return (
     <>
