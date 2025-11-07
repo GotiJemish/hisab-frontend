@@ -48,6 +48,24 @@ const ChevronLeftIcon = () => (
     />
   </svg>
 );
+const ChevronDownIcon = (props) => (
+  <svg
+    width={20}
+    height={20}
+    {...props}
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 const EyeIcon = (props) => (
   <svg
     width={20}
@@ -280,11 +298,12 @@ const XIcon = () => (
   </svg>
 );
 
-const AlertSuccess = () => (
+const AlertSuccess = ({ size = 24, className = "", ...rest }) => (
   <svg
-    className="fill-current"
-    width={24}
-    height={24}
+    className={`fill-current ${className}`}
+    width={size}
+    height={size}
+    {...rest}
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -295,11 +314,12 @@ const AlertSuccess = () => (
     />
   </svg>
 );
-const AlertError = () => (
+const AlertError = ({ size = 24, className = "", ...rest }) => (
   <svg
-    className="fill-current"
-    width={24}
-    height={24}
+    className={`fill-current ${className}`}
+    width={size}
+    height={size}
+    {...rest}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -312,11 +332,12 @@ const AlertError = () => (
     />
   </svg>
 );
-const AlertWarning = () => (
+const AlertWarning = ({ size = 24, className = "", ...rest }) => (
   <svg
-    className="fill-current"
-    width={24}
-    height={24}
+    className={`fill-current ${className}`}
+    width={size}
+    height={size}
+    {...rest}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -329,11 +350,12 @@ const AlertWarning = () => (
     />
   </svg>
 );
-const AlertInfo = () => (
+const AlertInfo = ({ size = 24, className = "", ...rest }) => (
   <svg
-    className="fill-current"
-    width={24}
-    height={24}
+    className={`fill-current ${className}`}
+    width={size}
+    height={size}
+    {...rest}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -396,24 +418,7 @@ const ContactIcon = (props) => (
     />
   </svg>
 );
-const ChevronDownIcon = (props) => (
-  <svg
-    width={20}
-    height={20}
-    {...props}
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+
 const GridIcon = (props) => (
   <svg
     width={24}
@@ -671,8 +676,8 @@ const ThreeDotIcon = (props) => (
 const CloseIcon = (props) => (
   <svg
     className={props?.className}
-    width={24}
-    height={24}
+    width={props?.size ||24}
+    height={props?.size ||24}
     {...props}
     viewBox="0 0 24 24"
     fill="none"
@@ -689,7 +694,7 @@ const CloseIcon = (props) => (
 
 const PlusIcon = (props) => (
   <svg
-   className={props?.className}
+    className={props?.className}
     width={12}
     height={12}
     {...props}

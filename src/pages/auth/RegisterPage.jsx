@@ -1,3 +1,238 @@
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AuthInput from "@/components/form/input/AuthInput";
+import Checkbox from "@/components/form/input/Checkbox";
+import { ChevronLeftIcon } from "@/icons";
+import { useLoading } from "@/context/LoadingContext";
+import { useToast } from "@/context/ToastContext";
+import apiClient from "@/utilities/apiClients";
+import { validateEmail, validateRequired } from "@/utilities/validations";
+
+const RegisterPage = () => {
+  const router = useRouter();
+  const { loading, setLoading } = useLoading();
+  const { showToast } = useToast();
+
+  const [form, setForm] = useState({ email: "", fname: "", lname: "" });
+  const [errors, setErrors] = useState({});
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleChange = (field, value) => {
+    setForm((s) => ({ ...s, [field]: value }));
+    setErrors((e) => ({ ...e, [field]: null }));
+  };
+
+  const validate = () => {
+    const e = {};
+    const emailErr = validateEmail(form.email);
+    if (emailErr) e.email = emailErr;
+
+    const fnameErr = validateRequired(form.fname, "First name");
+    if (fnameErr) e.fname = fnameErr;
+
+    const lnameErr = validateRequired(form.lname, "Last name");
+    if (lnameErr) e.lname = lnameErr;
+
+    if (!isChecked) e.terms = "You must accept the terms";
+    return e;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // call register endpoint which sends OTP
+      const res = await apiClient.post("auth/register/", {
+        email: form.email,
+        first_name: form.fname,
+        last_name: form.lname,
+      });
+
+      if (res?.status === 200 || res?.status === 201) {
+        // store for OTP flow
+        localStorage.setItem("registerEmail", form.email);
+        localStorage.setItem("f_name", form.fname);
+        localStorage.setItem("l_name", form.lname);
+
+        showToast({
+          message: "Verification code sent to your email.",
+          type: "success",
+        });
+
+        // navigate to OTP verify page and indicate it's for registration
+        router.push("/otp-verify?userType=newUser");
+      } else {
+        showToast({
+          message: res?.data?.message || "Failed to send verification code.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      showToast({
+        message: err?.response?.data?.message || "Registration failed.",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
+        <Link
+          href="/"
+          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          <ChevronLeftIcon />
+          Back to dashboard
+        </Link>
+      </div>
+
+      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+        <div>
+          <div className="mb-5 sm:mb-8">
+            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+              Sign Up
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Enter your email to get a verification code to finish sign up.
+            </p>
+          </div>
+
+          <div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
+              >
+                Sign up with X
+              </button>
+            </div>
+
+            <div className="relative py-3 sm:py-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <AuthInput
+                    label="First Name"
+                    required
+                    type="text"
+                    name="fname"
+                    controlId="fname"
+                    value={form.fname}
+                    onChange={(e) => handleChange("fname", e.target.value)}
+                    placeholder="Enter your first name"
+                    validation={{
+                      error: !!errors.fname,
+                      message: errors.fname,
+                    }}
+                  />
+
+                  <AuthInput
+                    label="Last Name"
+                    required
+                    type="text"
+                    name="lname"
+                    controlId="lname"
+                    value={form.lname}
+                    onChange={(e) => handleChange("lname", e.target.value)}
+                    placeholder="Enter your last name"
+                    validation={{
+                      error: !!errors.lname,
+                      message: errors.lname,
+                    }}
+                  />
+                </div>
+
+                <AuthInput
+                  label="Email"
+                  required
+                  type="email"
+                  name="email"
+                  controlId="email"
+                  value={form.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="Enter your email"
+                  validation={{ error: !!errors.email, message: errors.email }}
+                />
+
+                <div className="flex items-start gap-3 m-0">
+                  <Checkbox
+                    className="w-5 h-5 "
+                    checked={isChecked}
+                    onChange={setIsChecked}
+                    labelHidden
+                    inputClass="mt-1.5"
+                  />
+
+                  {/* {errors.terms && (
+                    <p className="text-sm text-red-500 ml-2">{errors.terms}</p>
+                  )} */}
+                  <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
+                    By creating an account means you agree to the{" "}
+                    <span className="text-gray-800 dark:text-white/90">
+                      Terms and Conditions,
+                    </span>{" "}
+                    and our{" "}
+                    <span className="text-gray-800 dark:text-white">
+                      Privacy Policy
+                    </span>
+                  </p>
+                </div>
+                {errors.terms && (
+                  <p className={`mt-1.5 text-xs text-error-500`}>
+                    {errors.terms}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-60"
+                >
+                  {loading ? "Signing up..." : "Sign Up"}
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-5">
+              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
+                Already have an account?{" "}
+                <Link
+                  href="/signin"
+                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                >
+                  Sign In
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default RegisterPage;
+
 // "use client";
 // import React, { useState } from "react";
 // import Link from "next/link";
@@ -267,233 +502,3 @@
 
 // export default RegisterPage;
 // app/(auth)/register/page.jsx  (or wherever you place it)
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import AuthInput from "@/components/form/input/AuthInput";
-import Checkbox from "@/components/form/input/Checkbox";
-import { ChevronLeftIcon } from "@/icons";
-import { useLoading } from "@/context/LoadingContext";
-import { useToast } from "@/context/ToastContext";
-import apiClient from "@/utilities/apiClients";
-import {
-  validateEmail,
-  validateRequired,
-} from "@/utilities/validations";
-
-const RegisterPage = () => {
-  const router = useRouter();
-  const { loading, setLoading } = useLoading();
-  const { showToast } = useToast();
-
-  const [form, setForm] = useState({ email: "", fname: "", lname: "" });
-  const [errors, setErrors] = useState({});
-  const [isChecked, setIsChecked] = useState(false);
-
-  const handleChange = (field, value) => {
-    setForm((s) => ({ ...s, [field]: value }));
-    setErrors((e) => ({ ...e, [field]: null }));
-  };
-
-  const validate = () => {
-    const e = {};
-    const emailErr = validateEmail(form.email);
-    if (emailErr) e.email = emailErr;
-
-    const fnameErr = validateRequired(form.fname, "First name");
-    if (fnameErr) e.fname = fnameErr;
-
-    const lnameErr = validateRequired(form.lname, "Last name");
-    if (lnameErr) e.lname = lnameErr;
-
-    if (!isChecked) e.terms = "You must accept the terms";
-    return e;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // call register endpoint which sends OTP
-      const res = await apiClient.post("auth/register/", {
-        email: form.email,
-        first_name: form.fname,
-        last_name: form.lname,
-      });
-
-      if (res?.status === 200 || res?.status === 201) {
-        // store for OTP flow
-        localStorage.setItem("registerEmail", form.email);
-        localStorage.setItem("f_name", form.fname);
-        localStorage.setItem("l_name", form.lname);
-
-        showToast({
-          message: "Verification code sent to your email.",
-          type: "success",
-        });
-
-        // navigate to OTP verify page and indicate it's for registration
-        router.push("/otp-verify?userType=newUser");
-      } else {
-        showToast({
-          message: res?.data?.message || "Failed to send verification code.",
-          type: "error",
-        });
-      }
-    } catch (err) {
-      showToast({
-        message: err?.response?.data?.message || "Registration failed.",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <>
-      <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <ChevronLeftIcon />
-          Back to dashboard
-        </Link>
-      </div>
-
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-        <div>
-          <div className="mb-5 sm:mb-8">
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign Up
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email to get a verification code to finish sign up.
-            </p>
-          </div>
-
-          <div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10"
-              >
-                Sign up with X
-              </button>
-            </div>
-
-            <div className="relative py-3 sm:py-5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
-                  Or
-                </span>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <AuthInput
-                    label="First Name"
-                    required
-                    type="text"
-                    name="fname"
-                    controlId="fname"
-                    value={form.fname}
-                    onChange={(e) => handleChange("fname", e.target.value)}
-                    placeholder="Enter your first name"
-                    validation={{
-                      error: !!errors.fname,
-                      message: errors.fname,
-                    }}
-                  />
-
-                  <AuthInput
-                    label="Last Name"
-                    required
-                    type="text"
-                    name="lname"
-                    controlId="lname"
-                    value={form.lname}
-                    onChange={(e) => handleChange("lname", e.target.value)}
-                    placeholder="Enter your last name"
-                    validation={{
-                      error: !!errors.lname,
-                      message: errors.lname,
-                    }}
-                  />
-                </div>
-
-                <AuthInput
-                  label="Email"
-                  required
-                  type="email"
-                  name="email"
-                  controlId="email"
-                  value={form.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  placeholder="Enter your email"
-                  validation={{ error: !!errors.email, message: errors.email }}
-                />
-
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    className="w-5 h-5"
-                    checked={isChecked}
-                    onChange={setIsChecked}
-                  />
-                  {errors.terms && (
-                    <p className="text-sm text-red-500 ml-2">{errors.terms}</p>
-                  )}
-                  <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
-                    <span className="text-gray-800 dark:text-white/90">
-                      Terms and Conditions,
-                    </span>{" "}
-                    and our{" "}
-                    <span className="text-gray-800 dark:text-white">
-                      Privacy Policy
-                    </span>
-                  </p>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-60"
-                >
-                  {loading ? "Signing up..." : "Sign Up"}
-                </button>
-              </div>
-            </form>
-
-            <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Already have an account?{" "}
-                <Link
-                  href="/signin"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                >
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-export default RegisterPage;

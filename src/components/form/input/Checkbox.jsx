@@ -1,13 +1,14 @@
 import React from "react";
 
-
 const Checkbox = ({
-  label,
-  checked,
-  id,
-  onChange,
+  label = "terms",
+  checked = false,
+  id = "checkbox",
+  onChange = () => {},
   className = "",
   disabled = false,
+  labelHidden = false,
+  inputClass=""
 }) => {
   return (
     <label
@@ -15,7 +16,7 @@ const Checkbox = ({
         disabled ? "cursor-not-allowed opacity-60" : ""
       }`}
     >
-      <div className="relative w-5 h-5">
+      <div className={`relative w-5 h-5 ${inputClass}`}>
         <input
           id={id}
           type="checkbox"
@@ -29,8 +30,8 @@ const Checkbox = ({
           <svg
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
             xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
+            width={14}
+            height={14}
             viewBox="0 0 14 14"
             fill="none"
           >
@@ -48,8 +49,8 @@ const Checkbox = ({
           <svg
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
             xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
+            width={14}
+            height={14}
             viewBox="0 0 14 14"
             fill="none"
           >
@@ -64,7 +65,7 @@ const Checkbox = ({
         )}
       </div>
 
-      {label && (
+      {!labelHidden && (
         <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
           {label}
         </span>
@@ -72,7 +73,5 @@ const Checkbox = ({
     </label>
   );
 };
-
-
 
 export default Checkbox;

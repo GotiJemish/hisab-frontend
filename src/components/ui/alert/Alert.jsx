@@ -1,16 +1,22 @@
-import { AlertError, AlertInfo, AlertSuccess, AlertWarning } from "@/icons";
+import {
+  AlertError,
+  AlertInfo,
+  AlertSuccess,
+  AlertWarning,
+  CloseIcon,
+} from "@/icons";
 import Link from "next/link";
 import React from "react";
-  // variant: "success" | "error" | "warning" | "info"; // Alert type
+// variant: "success" | "error" | "warning" | "info"; // Alert type
 
 const Alert = ({
-  variant,
-  title,
-  message,
+  variant = "error",
+  title = null,
+  message = null,
   showLink = false,
   linkHref = "#",
   linkText = "Learn more",
-  closeToast=()=>{}
+  closeToast = () => {},
 }) => {
   // Tailwind classes for each variant
   const variantClasses = {
@@ -38,28 +44,33 @@ const Alert = ({
 
   // Icon for each variant
   const icons = {
-    success:<AlertSuccess/>,
-    error:<AlertError/> ,
-    warning: <AlertWarning/>,
-    info: <AlertInfo/>,
+    success: <AlertSuccess size={20}/>,
+    error: <AlertError size={20}/>,
+    warning: <AlertWarning size={20}/>,
+    info: <AlertInfo size={20}/>,
   };
 
   return (
     <div
-      className={`rounded-xl border p-4 ${variantClasses[variant].container}`}
+      className={`rounded-lg border flex px-3 py-2 ${variantClasses[variant].container}`}
     >
       <div className="flex items-start gap-3">
-        <div className={`-mt-0.5 ${variantClasses[variant].icon}`}>
+        <div className={`flex gap-2 ${variantClasses[variant].icon}`}>
           {icons[variant]}
         </div>
 
         <div>
-          <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
-            {title}
-          </h4>
+          {title && (
+            <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
+              {title}
+            </h4>
+          )}
 
-          <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
-
+          {message && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {message}
+            </p>
+          )}
           {showLink && (
             <Link
               href={linkHref}
@@ -71,13 +82,14 @@ const Alert = ({
         </div>
       </div>
 
-        <button
-            onClick={closeToast}
-            className="text-lg font-bold ml-2 hover:opacity-70"
-            aria-label="Close toast"
-          >
-            &times;
-          </button>
+      <button
+        onClick={closeToast}
+        className={`text-lg font-bold ml-2 hover:opacity-70 -mt-4 -me-2 ${variantClasses[variant].icon}`}
+        aria-label="Close toast"
+      >
+        {/* &times; */}
+        <CloseIcon size={18}/>
+      </button>
     </div>
   );
 };

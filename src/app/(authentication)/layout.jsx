@@ -15,7 +15,6 @@ const AuthLayout = ({ children }) => {
           <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
             {children}
           </div>
-
           <div className="lg:w-1/2 w-full h-full bg-brand-950 dark:bg-white/5 lg:grid items-center hidden">
             <div className="relative items-center justify-center  flex z-1">
               {/* <!-- ===== Common Grid Shape Start ===== --> */}
