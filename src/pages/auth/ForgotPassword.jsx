@@ -64,7 +64,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 lg:w-1/2 w-full">
+    <>
       {/* Back Button */}
       <div className="w-full max-w-md pt-10 mx-auto">
         <Link
@@ -120,8 +120,7 @@ const ForgotPassword = () => {
             </Link>
           </p>
         </div>
-      </div>
-    </div>
+      </div></>
   );
 };
 
