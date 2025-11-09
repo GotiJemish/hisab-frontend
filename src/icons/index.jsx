@@ -146,10 +146,11 @@ const AngleDownIcon = () => (
   </svg>
 );
 
-const AngleUpIcon = () => (
+const AngleUpIcon = ({ className }) => (
   <svg
-    width="8"
-    height="5"
+    className={className}
+    width={8}
+    height={5}
     viewBox="0 0 8 5"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -676,8 +677,8 @@ const ThreeDotIcon = (props) => (
 const CloseIcon = (props) => (
   <svg
     className={props?.className}
-    width={props?.size ||24}
-    height={props?.size ||24}
+    width={props?.size || 24}
+    height={props?.size || 24}
     {...props}
     viewBox="0 0 24 24"
     fill="none"
