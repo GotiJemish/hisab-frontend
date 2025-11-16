@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from 'react';
-import ComponentCard from '../../common/ComponentCard';
-import Label from '../Label';
+import ComponentCard from '../../common/ComponentCard.jsx';
+import Label from '../Label.jsx';
 import Input from '../input/InputField.jsx';
-import Select from '../Select';
-import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons';
+import Select from '../Select.js';
+import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons/index.jsx';
 import DatePicker from '@/components/form/date-picker';
 
 export default function DefaultInputs() {
@@ -14,7 +14,7 @@ export default function DefaultInputs() {
     { value: "template", label: "Template" },
     { value: "development", label: "Development" },
   ];
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value="") => {
     console.log("Selected value:", value);
   };
   return (

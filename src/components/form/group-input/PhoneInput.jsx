@@ -1,19 +1,10 @@
 "use client";
+import { ChevronDownIcon } from "@/icons";
 import React, { useState } from "react";
 
-interface CountryCode {
-  code: string;
-  label: string;
-}
 
-interface PhoneInputProps {
-  countries: CountryCode[];
-  placeholder?: string;
-  onChange?: (phoneNumber: string) => void;
-  selectPosition?: "start" | "end"; // New prop for dropdown position
-}
 
-const PhoneInput: React.FC<PhoneInputProps> = ({
+const PhoneInput = ({
   countries,
   placeholder = "+1 (555) 000-0000",
   onChange,
@@ -22,12 +13,12 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
   const [selectedCountry, setSelectedCountry] = useState<string>("US");
   const [phoneNumber, setPhoneNumber] = useState<string>("+1");
 
-  const countryCodes: Record<string, string> = countries.reduce(
+  const countryCodes= countries.reduce(
     (acc, { code, label }) => ({ ...acc, [code]: label }),
     {}
   );
 
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCountryChange = (e) => {
     const newCountry = e.target.value;
     setSelectedCountry(newCountry);
     setPhoneNumber(countryCodes[newCountry]);
@@ -36,7 +27,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
     }
   };
 
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneNumberChange = (e) => {
     const newPhoneNumber = e.target.value;
     setPhoneNumber(newPhoneNumber);
     if (onChange) {
@@ -65,7 +56,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 flex items-center text-gray-700 pointer-events-none bg-none right-3 dark:text-gray-400">
-            <svg
+            {/* <svg
               className="stroke-current"
               width="20"
               height="20"
@@ -80,7 +71,8 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-            </svg>
+            </svg> */}
+            <ChevronDownIcon className="stroke-current"/> 
           </div>
         </div>
       )}
@@ -115,7 +107,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 flex items-center text-gray-700 pointer-events-none right-3 dark:text-gray-400">
-            <svg
+            {/* <svg
               className="stroke-current"
               width="20"
               height="20"
@@ -130,7 +122,8 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-            </svg>
+            </svg> */}
+            <ChevronDownIcon className="stroke-current"/>
           </div>
         </div>
       )}

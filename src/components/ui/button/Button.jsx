@@ -7,13 +7,14 @@ const Button = ({
   variant = "primary",
   startIcon,
   endIcon,
-  onClick,
+  onClick=()=>{},
   className = "",
   disabled = false,
   type="button"
 }) => {
   // Size Classes
   const sizeClasses = {
+    model:"px-4 py-2.5 text-sm",
     sm: "px-4 py-3 text-sm",
     md: "px-5 py-3.5 text-sm",
   };

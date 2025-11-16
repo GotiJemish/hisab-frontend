@@ -282,6 +282,8 @@
 
 
 @layer utilities {
+  input[type="number"].step-hidden::-webkit-inner-spin-button,
+  input[type="number"].step-hidden::-webkit-outer-spin-button,
   /* For Remove Date Icon */
   input[type="date"]::-webkit-inner-spin-button,
   input[type="time"]::-webkit-inner-spin-button,

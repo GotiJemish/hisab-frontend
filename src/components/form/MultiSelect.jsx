@@ -1,28 +1,20 @@
+import { ChevronDownIcon } from "@/icons";
 import React, { useState } from "react";
+import Label from "./Label";
 
-interface Option {
-  value: string;
-  text: string;
-  selected: boolean;
-}
-
-interface MultiSelectProps {
-  label: string;
-  options: Option[];
-  defaultSelected?: string[];
-  onChange?: (selected: string[]) => void;
-  disabled?: boolean;
-}
-
-const MultiSelect: React.FC<MultiSelectProps> = ({
-  label,
-  options,
+const MultiSelect = ({
+  id="",
+  options=[],
   defaultSelected = [],
-  onChange,
+  onChange=()=>{},
   disabled = false,
+  required = false,
+  label = "",
+  coverClass = "",
+  hiddenLabel = false,
 }) => {
-  const [selectedOptions, setSelectedOptions] =
-    useState<string[]>(defaultSelected);
+  let coverClasses = ` ${coverClass}`;
+  const [selectedOptions, setSelectedOptions] = useState(defaultSelected);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -30,7 +22,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     setIsOpen((prev) => !prev);
   };
 
-  const handleSelect = (optionValue: string) => {
+  const handleSelect = (optionValue) => {
     const newSelectedOptions = selectedOptions.includes(optionValue)
       ? selectedOptions.filter((value) => value !== optionValue)
       : [...selectedOptions, optionValue];
@@ -39,7 +31,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     if (onChange) onChange(newSelectedOptions);
   };
 
-  const removeOption = (index: number, value: string) => {
+  const removeOption = (index, value) => {
     const newSelectedOptions = selectedOptions.filter((opt) => opt !== value);
     setSelectedOptions(newSelectedOptions);
     if (onChange) onChange(newSelectedOptions);
@@ -50,14 +42,17 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   );
 
   return (
-    <div className="w-full">
-      <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        {label}
-      </label>
+    <div className={coverClasses}>
+      <Label
+        htmlFor={id}
+        required={required}
+        label={label}
+        isHidden={hiddenLabel}
+      />
 
       <div className="relative z-20 inline-block w-full">
         <div className="relative flex flex-col items-center">
-          <div onClick={toggleDropdown}  className="w-full">
+          <div onClick={toggleDropdown} className="w-full">
             <div className="mb-2 flex h-11 rounded-lg border border-gray-300 py-1.5 pl-3 pr-3 shadow-theme-xs outline-hidden transition focus:border-brand-300 focus:shadow-focus-ring dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-300">
               <div className="flex flex-wrap flex-auto gap-2">
                 {selectedValuesText.length > 0 ? (
@@ -104,10 +99,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
               <div className="flex items-center py-1 pl-1 pr-1 w-7">
                 <button
                   type="button"
-                  onClick={toggleDropdown} 
+                  onClick={toggleDropdown}
                   className="w-5 h-5 text-gray-700 outline-hidden cursor-pointer focus:outline-hidden dark:text-gray-400"
                 >
-                  <svg
+                  <ChevronDownIcon
+                    className={`stroke-current ${isOpen ? "rotate-180" : ""}`}
+                  />
+                  {/* <svg
                     className={`stroke-current ${isOpen ? "rotate-180" : ""}`}
                     width="20"
                     height="20"
@@ -122,7 +120,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
-                  </svg>
+                  </svg> */}
                 </button>
               </div>
             </div>

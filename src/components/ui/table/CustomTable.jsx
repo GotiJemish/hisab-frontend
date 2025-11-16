@@ -3,6 +3,7 @@ import {
   AngleUpIcon,
   ChevronDownIcon,
   DownloadIcon,
+  PencilIcon,
   SearchIcon,
 } from "@/icons";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -78,29 +79,8 @@ const CustomTable = ({
 
   const closeDropdown = () => setIsOpen(false);
 
+  
 
-    const columnsWithIds = useMemo(
-    () =>
-      columns.map((c, i) => ({
-        _id: c.id || c.accessor || `col_${i}`,
-        ...c,
-      })),
-    [columns]
-  );
-
-    // ✅ Sorting logic
-  const sortedData = useMemo(() => {
-    if (!sortConfig.key) return data;
-    const sorted = [...data].sort((a, b) => {
-      const key = sortConfig.key;
-      const aVal = typeof key === "function" ? key(a) : a[key];
-      const bVal = typeof key === "function" ? key(b) : b[key];
-      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  }, [data, sortConfig]);
 
 
   const toggleSort = (col) => {
@@ -115,185 +95,186 @@ const CustomTable = ({
       return { key: col.accessor, direction: "asc" };
     });
   };
-
-
+  // ✅ Sorting logic
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return data;
+    const sorted = [...data].sort((a, b) => {
+      const key = sortConfig.key;
+      const aVal = typeof key === "function" ? key(a) : a[key];
+      const bVal = typeof key === "function" ? key(b) : b[key];
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [data, sortConfig]);
   // ------------------------------
   // 🔹 Logic For Get Module Name
   // ------------------------------
+const columnsWithIds = useMemo(
+    () =>
+      columns.map((c, i) => ({
+        _id: c.id || c.accessor || `col_${i}`,
+        ...c,
+      })),
+    [columns]
+  );
+const renderCell = (row, rowIndex) => {
+  return columnsWithIds.map((col, colIndex) => {
+    const rowId = row[col.accessor];
 
+    // ⭐ Resolve value
+    const value =
+      typeof col.accessor === "function"
+        ? col.accessor(row)
+        : col.accessor
+        ? row[col.accessor]
+        : null;
 
-  const renderCell = (row, rowIndex) =>{
-    columnsWithIds.map((col, colIndex) => {
-      const value =
-        typeof col.accessor === "function"
-          ? col.accessor(row)
-          : col.accessor
-          ? row[col.accessor]
-          : null;
-      const isEditing =
-        editingCell?.rowId === row[keyField] &&
-        editingCell?.colId === col._id;
+    const content = col.cell ? col.cell(value, row, rowIndex) : value;
 
-     const commonProps = {
-        key: col._id || colIndex,
-        className: `px-4 py-3 text-gray-700 text-start text-sm ${tdClass} ${
-          col.tdClassName || ""
-        }`,
-        style: { ...tdStyle, ...col.tdStyle },
-      };
+    // ⭐ Common props WITHOUT key
+    const commonProps = {
+      className: `px-4 py-3 text-gray-700 text-start text-sm ${tdClass} ${
+        col.tdClassName || ""
+      }`,
+      style: { ...tdStyle, ...(col.tdStyle || {}) },
+    };
 
-      
-        switch (true) {
-          // 🟡 Status Dropdown
-          case col.isStatusDropdown:
-            return (
-              <TableCell {...commonProps} onClick={(e) => e.stopPropagation()}>
-                <StatusDropdown
-                  currentStatus={value}
-                  salesOrderId={rid}
-                  onStatusUpdated={(newStatus) =>
-                    onStatusChange(rid, newStatus)
-                  }
-                />
-              </TableCell>
-            );
+    const cellKey = col._id || colIndex;
 
-          // 🟡 Actions
-case hasActions:  
-return (
+    /* ------------------------------------------------------------------
+     * 🟡 STATUS DROPDOWN
+     * ------------------------------------------------------------------ */
+    if (col.isStatusDropdown) {
+      return (
+        <TableCell
+          key={cellKey}
+          {...commonProps}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <StatusDropdown
+            currentStatus={value}
+            salesOrderId={rowId}
+            onStatusUpdated={(newStatus) => onStatusChange(rowId, newStatus)}
+          />
+        </TableCell>
+      );
+    }
 
-          <TableCell
-            {...commonProps}
-            className={`${commonProps.className} py-4 text-gray-700`}
-            key={col._id}
-          >
-            {hasmultipleActions ? (
-              <div className="relative inline-block">
-                <div className="relative">
-                  <button
-                    className="text-gray-500 dark:text-gray-400 "
-                    onClick={toggleDropdown}
-                  >
-                    <ThreeDotIcon className="fill-current" />
-                  </button>
-                  <Dropdown
-                    isOpen={isOpen}
-                    onClose={closeDropdown}
-                    className="absolute z-10 right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
-                  >
-                    <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
-                      <li>
-                        <DropdownItem
-                          onItemClick={closeDropdown}
-                          tag="a"
-                          href="/profile"
-                          className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                        >
-                          View More
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                    <button
-                      onClick={() => {}}
-                      className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                    >
-                      {/* <SignOutIcon className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"/> */}
-                      Delete
-                    </button>
-                  </Dropdown>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                {col.showEdit && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      action.onEdit?.(row);
-                    }}
-                    title="Edit"
-                  >
-                    <EditIcon size={16} />
-                  </button>
-                )}
-                {col.showDelete && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      action.onDelete?.(row);
-                    }}
-                    title="Delete"
-                  >
-                    <DeleteIcon size={16} />
-                  </button>
-                )}
-              </div>
-            )}
-          </TableCell>
-        );
-
-          // 🟡 Switch
-          case col.isSwitch:
-            return (
-              <TableCell {...commonProps} onClick={(e) => e.stopPropagation()}>
-                <Checkbox
-                  type="switch"
-                  checked={!!value}
-                  onChange={(e) => col.onSwitchChange?.(e.target.checked, row)}
-                />
-              </TableCell>
-            );
-
-          // 🟡 Checkbox
-          case col.isCheckBox:
-            return (
-              <TableCell {...commonProps}>
-                <Checkbox
-                  checked={!!value}
-                  onChange={(e) => col.onCheck?.(e.target.checked, row)}
-                />
-              </TableCell>
-            );
-
-          // 🟡 Editable Cell
-          case col.isEditable: {
-            const isEditing =
-              editingCell?.rowId === rid && editingCell?.colId === col._id;
-            return (
-              <TableCell
-                {...commonProps}
-                style={{
-                  ...commonProps.style,
-                  backgroundColor: isEditing ? "var(--white)" : undefined,
-                }}
+    /* ------------------------------------------------------------------
+     * 🟡 ACTION BUTTONS
+     * ------------------------------------------------------------------ */
+    if (col.isActions) {
+      return (
+        <TableCell
+          key={cellKey}
+          {...commonProps}
+          className={`${commonProps.className} py-4`}
+        >
+          <div className="flex items-center gap-2">
+            {col.showEdit && (
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (col.renderEdit)
-                    setEditingCell({ rowId: rid, colId: col._id });
+                  action.onEdit?.(row);
                 }}
               >
-                {isEditing && col.renderEdit
-                  ? col.renderEdit({
-                      value,
-                      row,
-                      stopEditing: () => setEditingCell(null),
-                    })
-                  : content}
-              </TableCell>
-            );
-          }
+                {/* <EditIcon size={16} /> */}
+              </button>
+            )}
 
-          // 🟢 Default Cell
-          default:
-            return (
-              <TableCell key={col?.id} {...commonProps}>
-                {content}
-              </TableCell>
-            );
-        }
-      
-    });
-  };
+            {col.showDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  action.onDelete?.(row);
+                }}
+              >
+                {/* <DeleteIcon size={16} /> */}
+              </button>
+            )}
+          </div>
+        </TableCell>
+      );
+    }
+
+    /* ------------------------------------------------------------------
+     * 🟡 SWITCH FIELD
+     * ------------------------------------------------------------------ */
+    if (col.isSwitch) {
+      return (
+        <TableCell
+          key={cellKey}
+          {...commonProps}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Checkbox
+            type="switch"
+            checked={!!value}
+            onChange={(e) =>
+              col.onSwitchChange?.(e.target.checked, row)
+            }
+          />
+        </TableCell>
+      );
+    }
+
+    /* ------------------------------------------------------------------
+     * 🟡 CHECKBOX FIELD
+     * ------------------------------------------------------------------ */
+    if (col.isCheckBox) {
+      return (
+        <TableCell key={cellKey} {...commonProps}>
+          <Checkbox
+            checked={!!value}
+            onChange={(e) => col.onCheck?.(e.target.checked, row)}
+          />
+        </TableCell>
+      );
+    }
+
+    /* ------------------------------------------------------------------
+     * 🟡 EDITABLE CELL
+     * ------------------------------------------------------------------ */
+    if (col.isEditable) {
+      const isEditing =
+        editingCell?.rowId === rowId && editingCell?.colId === col._id;
+
+      return (
+        <TableCell
+          key={cellKey}
+          {...commonProps}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (col.renderEdit)
+              setEditingCell({ rowId, colId: col._id });
+          }}
+        >
+          {isEditing && col.renderEdit
+            ? col.renderEdit({
+                value,
+                row,
+                stopEditing: () => setEditingCell(null),
+              })
+            : content}
+        </TableCell>
+      );
+    }
+
+    /* ------------------------------------------------------------------
+     * 🟢 DEFAULT CELL
+     * ------------------------------------------------------------------ */
+    return (
+      <TableCell key={cellKey} {...commonProps}>
+        {content}
+      </TableCell>
+    );
+  });
+};
+
+
+
 
   const sortTable = (colId, type) => {
     console.log("Sorting by:", colId, type);

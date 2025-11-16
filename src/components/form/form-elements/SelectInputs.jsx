@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
 import Select from "../Select";
-import MultiSelect from "../MultiSelect";
+import MultiSelect from "../CustomSelect";
 import { ChevronDownIcon } from "@/icons";
 
 export default function SelectInputs() {
@@ -15,7 +15,7 @@ export default function SelectInputs() {
 
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value="") => {
     console.log("Selected value:", value);
   };
 

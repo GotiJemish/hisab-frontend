@@ -8,7 +8,7 @@ import { PlusIcon } from "@/icons";
 import { getAllContacts } from "@/apis/contacts";
 import { useLoading } from "@/context/LoadingContext";
 import { useToast } from "@/context/ToastContext";
-import CustomTable from "@/components/common/table/CustomTable";
+import CustomTable from "@/components/ui/table/CustomTable";
 import { MAIN_TABLE_COLUMNS } from "./constants";
 
 const ContactsModule = () => {
@@ -17,27 +17,30 @@ const ContactsModule = () => {
   const { loading, setLoading } = useLoading();
   const [contacts, setContacts] = useState([
     {
-      id: 35,
-      name: "1",
-      mobile: "8849853373",
-      email: "gja5364@gmail.com",
-      pan: "qqqqqqqqqq",
-      gst: "qqqqqqqqqqqqqqq",
-      main_address: "",
-      billing_address: "asdas",
-      city: "asda",
-      state: "asda",
-      country: "India",
-      pincode: "148545",
-      total_amount: "0.00",
-      payment_type: "receivable",
-      payment_status: "pending",
-      notes: "asdad",
-      created_at: "2025-11-07T16:10:16.450208Z",
-      updated_at: "2025-11-07T16:10:16.450236Z",
-      user: "47c84493-ddb9-43b3-b659-370909eea472",
-    },
-  ]);
+        "id": 35,
+        "name": "1",
+        "mobile": "8849853373",
+        "email": "gja5364@gmail.com",
+        "pan": "qqqqqqqqqq",
+        "gst": "qqqqqqqqqqqqqqq",
+        "billing_address": "asdas",
+        "billing_city": "asda",
+        "billing_state": "asda",
+        "billing_pincode": "148545",
+        "same_as_billing": false,
+        "shipping_address": "",
+        "shipping_city": "",
+        "shipping_state": "",
+        "shipping_pincode": "",
+        "total_amount": "0.00",
+        "payment_type": "receivable",
+        "payment_status": "pending",
+        "notes": "asdad",
+        "created_at": "2025-11-07T16:10:16.450208Z",
+        "updated_at": "2025-11-07T16:10:16.450236Z",
+        "user": "47c84493-ddb9-43b3-b659-370909eea472"
+    }
+]);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -57,6 +60,9 @@ const ContactsModule = () => {
 
     fetchContacts();
   }, []);
+  console.log(contacts);
+  const submitContact=()=>{console.log("efbewjhbfje");
+  }
   return (
     <>
       <div className="flex justify-between align-center mb-2">
@@ -75,7 +81,12 @@ const ContactsModule = () => {
         isOpen={isOpen}
         onClose={closeModal}
         calendarsEvents={{ work: "blue", personal: "red" }}
-        title="dhbv"
+        title="New Contact"
+        size="lg"
+        handleSubmit={(data) => {
+    console.log("FINAL SUBMITTED DATA:", data);
+    // save to backend here...
+  }}
       />
     </>
   );

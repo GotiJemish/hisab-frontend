@@ -1,11 +1,26 @@
-import React, { useState } from 'react'
-import Label from '../Label';
-import { EyeCloseIcon, EyeIcon } from '@/icons';
+import React, { useState } from "react";
+import Label from "../Label";
+import { EyeCloseIcon, EyeIcon } from "@/icons";
 
-const AuthInput = ({label="", type = "text", required = false, name = "", controlId = "",step=1, onChange = () => { }, defaultValue = "", placeholder = "", disabled = false, className = "", min = 0, max = 1000, validation={}  }) => {
-    const{message = "", error = false, success = false}=validation;
-    const [showPassword, setShowPassword] = useState(false);
-     let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
+const AuthInput = ({
+  label = "",
+  type = "text",
+  required = false,
+  name = "",
+  controlId = "",
+  step = 1,
+  onChange = () => {},
+  defaultValue = "",
+  placeholder = "",
+  disabled = false,
+  className = "",
+  min = 0,
+  max = 1000,
+  validation = {},
+}) => {
+  const { message = "", error = false, success = false } = validation;
+  const [showPassword, setShowPassword] = useState(false);
+  let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 
   // Add styles for the different states
   if (disabled) {
@@ -17,56 +32,57 @@ const AuthInput = ({label="", type = "text", required = false, name = "", contro
   } else {
     inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800`;
   }
-    return (
-        <div>
-            <Label htmlFor={controlId} required={required} label={label}/>
-                
-            <div className="relative">
+  return (
+    <div>
+      <Label htmlFor={controlId} required={required} label={label} />
 
-                <input
-                    type={type === "password" ? showPassword ? "text" : "password" : type}
-                    id={controlId}
-                    name={name}
-                    placeholder={placeholder}
-                    defaultValue={defaultValue}
-                    onChange={onChange}
-                    min={min}
-                    max={max}
-                    step={step}
-                    disabled={disabled}
-                    className={inputClasses}
-                />
+      <div className="relative">
+        <input
+          type={
+            type === "password" ? (showPassword ? "text" : "password") : type
+          }
+          id={controlId}
+          name={name}
+          placeholder={placeholder}
+          defaultValue={defaultValue}
+          onChange={onChange}
+          min={min}
+          max={max}
+          step={step}
+          disabled={disabled}
+          className={inputClasses}
+        />
 
-                {/* Optional Hint Text */}
-                
+        {/* Optional Hint Text */}
 
+        {type === "password" && (
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+          >
+            {showPassword ? (
+              <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+            ) : (
+              <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+            )}
+          </span>
+        )}
+      </div>
+      {message && (
+        <p
+          className={`mt-1.5 text-xs ${
+            error
+              ? "text-error-500"
+              : success
+              ? "text-success-500"
+              : "text-gray-500"
+          }`}
+        >
+          {message}
+        </p>
+      )}
+    </div>
+  );
+};
 
-                {type === "password" && <span
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-                >
-                    {showPassword ? (
-                        <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
-                    ) : (
-                        <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
-                    )}
-                </span>}
-
-            </div>
-            {message && (
-                    <p
-                        className={`mt-1.5 text-xs ${error
-                            ? "text-error-500"
-                            : success
-                                ? "text-success-500"
-                                : "text-gray-500"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
-        </div>
-    )
-}
-
-export default AuthInput
+export default AuthInput;
