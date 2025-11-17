@@ -1,12 +1,15 @@
 import Form from "@/components/form/Form";
 import { CloseIcon } from "@/icons";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../button/Button";
 // import Modal from "../ui/modal";
 
 // 🧩 Higher-Order Component
 const withModal = (WrappedComponent) => {
+  
   return function ModalWrapper(props) {
+    const [internalSubmit, setInternalSubmit] = useState(null);
+    
     const {
       isOpen,
       onClose,
@@ -29,21 +32,22 @@ const withModal = (WrappedComponent) => {
       fullwidth: "max-w-screen",
     };
 
-    useEffect(() => {
-      const handleEscape = (event) => {
-        if (event.key === "Escape") {
-          onClose();
-        }
-      };
+useEffect(() => {
+  if (!isOpen) return;
 
-      if (isOpen) {
-        document.addEventListener("keydown", handleEscape);
-      }
+  const handleEscape = (event) => {
+    if (event.key === "Escape") onClose();
+  };
 
-      return () => {
-        document.removeEventListener("keydown", handleEscape);
-      };
-    }, [isOpen, onClose]);
+  document.addEventListener("keydown", handleEscape);
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.removeEventListener("keydown", handleEscape);
+    document.body.style.overflow = "unset";
+  };
+}, [isOpen, onClose]);
+
 
     useEffect(() => {
       if (isOpen) {
@@ -104,8 +108,9 @@ const withModal = (WrappedComponent) => {
                   </button>
                 )}
               </div>
-              <Form onSubmit={(e)=>{e.preventDefault(); handleSubmit();}}>
-                <WrappedComponent {...props} />
+              <Form onSubmit={(e)=>{e.preventDefault(); if (internalSubmit) internalSubmit();}}>
+                <WrappedComponent {...props} setInternalSubmit={setInternalSubmit} />
+
                 <div className="flex items-center gap-3 mt-6 sm:justify-end border-t sticky bottom-0 py-4 z-999 bg-white dark:bg-gray-900">
                   <Button
                     title={"Close"}

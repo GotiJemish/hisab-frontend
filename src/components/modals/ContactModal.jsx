@@ -1,5 +1,5 @@
 // ContactModal.jsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import withModal from "../ui/modal/withModal";
 import Button from "../ui/button/Button";
 import InputField from "../form/input/InputField";
@@ -14,8 +14,8 @@ const multiOptions = [
   { value: "4", label: "Option 4" },
   { value: "5", label: "Option 5" },
 ];
-const ContactModalInner = ({handleSubmit }) => {
-  const [sameAsBilling, setSameAsBilling] = useState(false);
+
+const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
   const [form, setForm] = useState({
     name: "",
     mobile: "",
@@ -23,41 +23,64 @@ const ContactModalInner = ({handleSubmit }) => {
     gst: "",
     pan: "",
     notes: "",
-    amount: "",
-    amount_type: "",
+    total_amount: "",
+    payment_type: "",
+    same_as_billing: false,
   });
-  // Billing Address State
+
   const [billing, setBilling] = useState({
-    address1: "",
-    address2: "",
-    city: "",
-    pin: "",
-    state: "",
-    country: "",
+    billing_address: "",
+    billing_city: "",
+    billing_state: "",
+    billing_pincode: "",
+    billing_country: "",
   });
 
-  // Shipping Address State
   const [shipping, setShipping] = useState({
-    address1: "",
-    address2: "",
-    city: "",
-    pin: "",
-    state: "",
-    country: "",
+    shipping_address: "",
+    shipping_city: "",
+    shipping_state: "",
+    shipping_pincode: "",
+    shipping_country: "",
   });
 
-  /** -----------------------------
-   * SYNC BILLING → SHIPPING
-   * ----------------------------- */
+  const sameAsBilling = form.same_as_billing;
+
+  /** --------------------------------------------------
+   * SYNC SHIPPING WHEN SAME-AS-BILLING IS TRUE
+   * -------------------------------------------------- */
   useEffect(() => {
     if (sameAsBilling) {
-      setShipping({ ...billing });
+      setShipping({
+        shipping_address: billing.billing_address,
+        shipping_city: billing.billing_city,
+        shipping_state: billing.billing_state,
+        shipping_pincode: billing.billing_pincode,
+        shipping_country: billing.billing_country,
+      });
     }
   }, [sameAsBilling, billing]);
 
-  /** -----------------------------
-   * GENERIC INPUT HANDLERS
-   * ----------------------------- */
+  /** --------------------------------------------------
+   * SUBMIT HANDLER
+   * -------------------------------------------------- */
+  const submitData = useCallback(() => {
+    const payload = {
+      ...form,
+      billing_address: billing,
+      shipping_address: sameAsBilling ? billing : shipping,
+    };
+
+    handleSubmit(payload);
+  }, [form, billing, shipping, sameAsBilling, handleSubmit]);
+
+  useEffect(() => {
+    setInternalSubmit(() => submitData);
+  }, [submitData]);
+
+  /** --------------------------------------------------
+   * GENERIC CHANGERS
+   * -------------------------------------------------- */
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -71,119 +94,114 @@ const ContactModalInner = ({handleSubmit }) => {
     setShipping((prev) => ({ ...prev, [field]: value }));
   };
 
-  /** -----------------------------
-   * SUBMIT FUNCTION
-   * ----------------------------- */
-  const submitData = () => {
-    const data = {
-      ...form,
-      billing_address: billing,
-      shipping_address: sameAsBilling ? billing : shipping,
-    };
-
-    handleSubmit(data);  // ⬅️ Send to parent  
-  };
   return (
     <>
       <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+        {/* FORM FIELDS */}
         <InputField
           id="name"
           name="name"
           label="Name"
           type="text"
-          onChange={() => {}}
+          value={form.name}
+          onChange={(e) => handleFormChange("name", e.target.value)}
           placeholder="Enter Name"
           required
           coverClass="col-span-1"
         />
+
         <InputField
           id="mobile"
           name="mobile"
           label="Mobile"
           type="text"
-          onChange={() => {}}
+          value={form.mobile}
+          onChange={(e) => handleFormChange("mobile", e.target.value)}
           placeholder="Enter Mobile"
           required
           coverClass="col-span-1"
         />
+
         <InputField
           id="email"
           name="email"
           label="Email"
           type="email"
-          onChange={() => {}}
+          value={form.email}
+          onChange={(e) => handleFormChange("email", e.target.value)}
           placeholder="Enter Email"
           coverClass="col-span-1"
         />
-        <div className="col-span-1"></div>
+
+        <div />
+
         <InputField
           id="gst"
           name="gst"
           label="GSTIN"
           type="text"
-          onChange={() => {}}
+          value={form.gst}
+          onChange={(e) => handleFormChange("gst", e.target.value)}
           placeholder="Enter GST Number"
           coverClass="col-span-1"
         />
+
         <InputField
           id="pan"
           name="pan"
           label="PAN No."
           type="text"
-          onChange={() => {}}
-          placeholder="PAN No."
+          value={form.pan}
+          onChange={(e) => handleFormChange("pan", e.target.value)}
+          placeholder="Enter PAN"
           coverClass="col-span-1"
         />
+
+        {/* BILLING - SHIPPING HEADINGS */}
         <h6 className="col-span-1 text-gray-800 dark:text-white/90">
           Billing Address
         </h6>
+
         <div className="col-span-1 grid grid-cols-1 gap-x-2 sm:grid-cols-2">
           <h6 className="text-gray-800 dark:text-white/90">Shipping Address</h6>
+
           <Checkbox
-            label="Same as biling address"
+            label="Same as billing address"
             checked={sameAsBilling}
-            onChange={(e) => setSameAsBilling(!sameAsBilling)}
+            onChange={() => handleFormChange("same_as_billing", !sameAsBilling)}
           />
         </div>
 
+        {/* BILLING START */}
         <div className="col-span-1 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <InputField
-            id="billing_address_1"
-            name="billing_address_1"
-            label="Address Line 1"
+            label="Address"
+            id="billing_address"
             type="text"
-            value={billing.address1}
-            onChange={(e) => handleBillingChange("address1", e.target.value)}
-            placeholder="12,abc,skjdn"
-            coverClass="col-span-1 sm:col-span-2"
-          />
-          <InputField
-            id="billing_address_2"
-            name="billing_address_2"
-            label="Address Line 2"
-            type="text"
-            value={billing.address2}
-            onChange={(e) => handleBillingChange("address2", e.target.value)}
-            placeholder="12,abc,skjdn"
+            value={billing.billing_address}
+            onChange={(e) =>
+              handleBillingChange("billing_address", e.target.value)
+            }
             coverClass="col-span-1 sm:col-span-2"
           />
 
           <CustomSelect
             label="City"
-            placeholder="select city"
-            required
-            options={multiOptions}
-            onChange={(opt) => handleBillingChange("city", opt?.value)}
-            coverClass="col-span-1"
             id="billing_city"
+            options={multiOptions}
+            value={multiOptions.find((o) => o.value === billing.billing_city)}
+            onChange={(opt) => handleBillingChange("billing_city", opt?.value)}
+            coverClass="col-span-1"
           />
+
           <InputField
-            id="billing_pin"
-            name="pin"
-            label="Pin code"
+            id="billing_pincode"
+            label="Pin Code"
             type="number"
-            onChange={(e) => handleBillingChange("pin", e.target.value)}
-            placeholder="148545"
+            value={billing.billing_pincode}
+            onChange={(e) =>
+              handleBillingChange("billing_pincode", e.target.value)
+            }
             stepHidden
             coverClass="col-span-1"
           />
@@ -191,65 +209,61 @@ const ContactModalInner = ({handleSubmit }) => {
           <CustomSelect
             label="State"
             id="billing_state"
-            placeholder="select State"
-            required
             options={multiOptions}
-            onChange={(opt) => handleBillingChange("state", opt?.value)}
+            value={multiOptions.find((o) => o.value === billing.billing_state)}
+            onChange={(opt) => handleBillingChange("billing_state", opt?.value)}
             coverClass="col-span-1"
           />
+
           <CustomSelect
             label="Country"
             id="billing_country"
-            placeholder="select Country"
-            required
-            onChange={(opt) => handleBillingChange("country", opt?.value)}
-            options={multiOptions}
             coverClass="col-span-1"
+            options={multiOptions}
+            value={multiOptions.find(
+              (o) => o.value === billing.billing_country
+            )}
+            onChange={(opt) =>
+              handleBillingChange("billing_country", opt?.value)
+            }
           />
         </div>
+
+        {/* SHIPPING */}
         <div className="col-span-1 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <InputField
-            id="shipping_address_1"
-            name="shipping_address_1"
-            label="Address Line 1"
+            label="Address"
+            id="shipping_address"
             type="text"
-            value={shipping.address1}
+            value={shipping.shipping_address}
             disabled={sameAsBilling}
-            onChange={(e) => handleShippingChange("address1", e.target.value)}
-            placeholder="12,abc,skjdn"
-            coverClass="col-span-1 sm:col-span-2"
-          />
-          <InputField
-            id="shipping_address_2"
-            name="shipping_address_2"
-            label="Address Line 2"
-            type="text"
-            value={shipping.address2}
-            disabled={sameAsBilling}
-            onChange={(e) => handleShippingChange("address2", e.target.value)}
-            placeholder="12,abc,skjdn"
+            onChange={(e) =>
+              handleShippingChange("shipping_address", e.target.value)
+            }
             coverClass="col-span-1 sm:col-span-2"
           />
 
           <CustomSelect
             label="City"
-            placeholder="select city"
-            required
-            options={multiOptions}
-            disabled={sameAsBilling}
-            onChange={(opt) => handleShippingChange("city", opt?.value)}
-            coverClass="col-span-1"
             id="shipping_city"
-          />
-          <InputField
-            id="shipping_pin"
-            name="pin"
-            label="Pin code"
-            type="number"
-            value={shipping.pin}
             disabled={sameAsBilling}
-            onChange={(e) => handleShippingChange("pin", e.target.value)}
-            placeholder="148545"
+            options={multiOptions}
+            value={multiOptions.find((o) => o.value === shipping.shipping_city)}
+            onChange={(opt) =>
+              handleShippingChange("shipping_city", opt?.value)
+            }
+            coverClass="col-span-1"
+          />
+
+          <InputField
+            id="shipping_pincode"
+            label="Pin Code"
+            type="number"
+            value={shipping.shipping_pincode}
+            disabled={sameAsBilling}
+            onChange={(e) =>
+              handleShippingChange("shipping_pincode", e.target.value)
+            }
             stepHidden
             coverClass="col-span-1"
           />
@@ -257,47 +271,54 @@ const ContactModalInner = ({handleSubmit }) => {
           <CustomSelect
             label="State"
             id="shipping_state"
-            placeholder="select State"
-            required
-            value={shipping.state}
-            options={multiOptions}
             disabled={sameAsBilling}
-            onChange={(opt) => handleShippingChange("state", opt?.value)}
+            options={multiOptions}
+            value={multiOptions.find(
+              (o) => o.value === shipping.shipping_state
+            )}
+            onChange={(opt) =>
+              handleShippingChange("shipping_state", opt?.value)
+            }
             coverClass="col-span-1"
           />
+
           <CustomSelect
             label="Country"
             id="shipping_country"
-            placeholder="select Country"
-            required
-            options={multiOptions}
-            value={shipping.country}
             disabled={sameAsBilling}
-            onChange={(opt) => handleShippingChange("country", opt?.value)}
+            options={multiOptions}
+            value={multiOptions.find(
+              (o) => o.value === shipping.shipping_country
+            )}
+            onChange={(opt) =>
+              handleShippingChange("shipping_country", opt?.value)
+            }
             coverClass="col-span-1"
           />
         </div>
+
+        {/* Opening Balance */}
         <h6 className="col-span-1 sm:col-span-2 text-gray-800 dark:text-white/90">
           Opening Balance
         </h6>
         <div className="col-span-1 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <InputField
-            id="amount"
-            name="amount"
-            label="Amount"
+            id="total_amount"
+            label="Total Amount"
             type="number"
+            value={form.total_amount}
             min={0}
-            onChange={() => {}}
-            placeholder="12,abc,skjdn"
+            onChange={(e) => handleFormChange("total_amount", e.target.value)}
             coverClass="col-span-1"
           />
+
           <CustomSelect
-            label="Amount Type"
-            placeholder="select Amount type"
-            required
+            label="Payment Type"
+            id="payment_type"
             options={multiOptions}
+            value={multiOptions.find((o) => o.value === form.payment_type)}
+            onChange={(opt) => handleFormChange("payment_type", opt?.value)}
             coverClass="col-span-1"
-            id="amount_type"
           />
         </div>
         <InputField
@@ -306,14 +327,15 @@ const ContactModalInner = ({handleSubmit }) => {
           label="Notes"
           type="textarea"
           rows={6}
-          onChange={() => {}}
-          placeholder="Enter Notes"
+          value={form.notes}
+          onChange={(e) => handleFormChange("notes", e.target.value)}
           coverClass="col-span-1 sm:col-span-2"
         />
       </div>
     </>
   );
 };
+
 const ContactModal = withModal(ContactModalInner, "Add or Edit Event");
 export default ContactModal;
 {

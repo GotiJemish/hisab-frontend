@@ -6,7 +6,7 @@ const InputField = ({
   id = "",
   name = "",
   placeholder = "",
-  defaultValue = "",
+  // defaultValue = null,
   onChange = () => {},
   className = "",
   min,
@@ -86,7 +86,7 @@ const InputField = ({
           id={id}
           name={name}
           placeholder={placeholder}
-          defaultValue={defaultValue}
+          // defaultValue={defaultValue}
           onChange={onChange}
           min={min}
           max={max}

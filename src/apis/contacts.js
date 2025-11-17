@@ -14,6 +14,16 @@ export const getAllContacts = async () => {
   }
 };
 
-
+export const createContact=async (payload)=>{
+   try {
+    // ✅ Pass user as query param
+    const response = await apiClient.post(`/contacts/`,{payload});
+    return response.data; // or response.data.data based on your backend response
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+   handleApiError(error, "error");
+    throw error;
+  }
+}
 
 

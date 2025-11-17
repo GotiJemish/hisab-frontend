@@ -5,7 +5,7 @@ import { useModal } from "@/hooks/useModal";
 import ContactModal from "@/components/modals/ContactModal";
 import Button from "@/components/ui/button/Button";
 import { PlusIcon } from "@/icons";
-import { getAllContacts } from "@/apis/contacts";
+import { createContact, getAllContacts } from "@/apis/contacts";
 import { useLoading } from "@/context/LoadingContext";
 import { useToast } from "@/context/ToastContext";
 import CustomTable from "@/components/ui/table/CustomTable";
@@ -17,30 +17,30 @@ const ContactsModule = () => {
   const { loading, setLoading } = useLoading();
   const [contacts, setContacts] = useState([
     {
-        "id": 35,
-        "name": "1",
-        "mobile": "8849853373",
-        "email": "gja5364@gmail.com",
-        "pan": "qqqqqqqqqq",
-        "gst": "qqqqqqqqqqqqqqq",
-        "billing_address": "asdas",
-        "billing_city": "asda",
-        "billing_state": "asda",
-        "billing_pincode": "148545",
-        "same_as_billing": false,
-        "shipping_address": "",
-        "shipping_city": "",
-        "shipping_state": "",
-        "shipping_pincode": "",
-        "total_amount": "0.00",
-        "payment_type": "receivable",
-        "payment_status": "pending",
-        "notes": "asdad",
-        "created_at": "2025-11-07T16:10:16.450208Z",
-        "updated_at": "2025-11-07T16:10:16.450236Z",
-        "user": "47c84493-ddb9-43b3-b659-370909eea472"
-    }
-]);
+      id: 35,
+      name: "1",
+      mobile: "8849853373",
+      email: "gja5364@gmail.com",
+      pan: "qqqqqqqqqq",
+      gst: "qqqqqqqqqqqqqqq",
+      billing_address: "asdas",
+      billing_city: "asda",
+      billing_state: "asda",
+      billing_pincode: "148545",
+      same_as_billing: false,
+      shipping_address: "",
+      shipping_city: "",
+      shipping_state: "",
+      shipping_pincode: "",
+      total_amount: "0.00",
+      payment_type: "receivable",
+      payment_status: "pending",
+      notes: "asdad",
+      created_at: "2025-11-07T16:10:16.450208Z",
+      updated_at: "2025-11-07T16:10:16.450236Z",
+      user: "47c84493-ddb9-43b3-b659-370909eea472",
+    },
+  ]);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -49,6 +49,7 @@ const ContactsModule = () => {
         const data = await getAllContacts();
         setContacts(data?.data);
       } catch (error) {
+        setLoading(false);
         showToast({
           message: "Failed to fetch contacts.",
           type: "error",
@@ -60,9 +61,30 @@ const ContactsModule = () => {
 
     fetchContacts();
   }, []);
-  console.log(contacts);
-  const submitContact=()=>{console.log("efbewjhbfje");
-  }
+  // console.log(contacts);
+  const submitContact = async (payload) => {
+    console.log("adguad", payload);
+
+    try {
+      setLoading(true);
+      const data = await createContact(payload);
+      if (data?.success) {
+        closeModal;
+        showToast({
+          message: "contact add successfully.",
+          type: "success",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      showToast({
+        message: "Failed to add contacts.",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
       <div className="flex justify-between align-center mb-2">
@@ -74,7 +96,13 @@ const ContactsModule = () => {
         />
       </div>
       <div>
-        <CustomTable isSelectable={true} columns={MAIN_TABLE_COLUMNS} hasActions data={contacts} hasmultipleActions/>
+        <CustomTable
+          isSelectable={true}
+          columns={MAIN_TABLE_COLUMNS}
+          hasActions
+          data={contacts}
+          hasmultipleActions
+        />
       </div>
 
       <ContactModal
@@ -84,9 +112,8 @@ const ContactsModule = () => {
         title="New Contact"
         size="lg"
         handleSubmit={(data) => {
-    console.log("FINAL SUBMITTED DATA:", data);
-    // save to backend here...
-  }}
+          submitContact(data);
+        }}
       />
     </>
   );
