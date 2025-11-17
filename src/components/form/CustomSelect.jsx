@@ -9,15 +9,9 @@ import { components as RSComponents } from "react-select";
 const DropdownIndicator = (props) => (
   <RSComponents.DropdownIndicator {...props}>
     <ChevronDownIcon
-      style={{
-        transform: props?.selectProps?.menuIsOpen
-          ? "rotate(180deg)"
-          : "rotate(0deg)",
-        transition: "transform 0.2s ease-in-out",
-        color: props?.selectProps?.menuIsOpen
-          ? "var(--text-primary)"
-          : "var(--text-secondary)",
-      }}
+      className={`stroke-current ${
+        props?.selectProps?.menuIsOpen ? "rotate-180" : ""
+      }`}
     />
   </RSComponents.DropdownIndicator>
 );
@@ -25,7 +19,7 @@ const DropdownIndicator = (props) => (
 const SearchControl = (props) => (
   <RSComponents.Control {...props}>
     <span style={{ marginLeft: 8, display: "flex", alignItems: "center" }}>
-      <SearchIcon />
+      <SearchIcon className="fill-current" />
     </span>
     {props.children}
   </RSComponents.Control>
@@ -62,117 +56,29 @@ const CustomSelect = ({
   label = "",
   coverClass = "",
   hiddenLabel = false,
+  classNames: classNamesOverride = {},
   ...rest
 }) => {
   let coverClasses = ` ${coverClass}`;
-  const {
-    minWidth: contMinWidth = "auto",
-    maxWidth: contMaxWidth = "100%",
-    width: contWidth = "100%",
-  } = container || {};
-  const {
-    minWidth: menuMinWidth = "auto",
-    maxWidth: menuMaxWidth = "100%",
-    width: menuWidth = "100%",
-  } = menu || {};
-  const baseStyles = useMemo(
-    () => ({
-      container: (provided) => ({
-        ...provided,
-        minWidth: contMinWidth,
-        maxWidth: contMaxWidth,
-        width: contWidth,
-      }),
-      control: (provided, state) => ({
-        ...provided,
-        borderRadius: "8px",
-        minHeight: "40px",
-        cursor: "pointer",
-        borderColor: validation?.isInvalid
-          ? "var(--danger)"
-          : state.isFocused
-          ? "var(--primary)"
-          : "var(--border-primary)",
-        boxShadow: "none",
-        "&:hover": {
-          borderColor: validation?.isInvalid
-            ? "var(--danger)"
-            : "var(--primary)",
-        },
-      }),
-      placeholder: (provided) => ({
-        ...provided,
-        color: "var(--text-secondary)",
-        fontSize: "14px",
-        lineHeight: "16px",
-      }),
-      input: (provided) => ({
-        ...provided,
-        color: "var(--text-primary)",
-        fontSize: "14px",
-        lineHeight: "16px",
-      }),
-      menu: (provided) => ({
-        ...provided,
-        minWidth: menuMinWidth,
-        maxWidth: menuMaxWidth,
-        width: menuWidth,
-        zIndex: 9999,
-        borderRadius: "6px",
-        padding: "8px",
-        backgroundColor: "var(--white)",
-        boxShadow: "0 4px 12px var(--shadow-1)",
-      }),
-      menuList: (provided) => ({
-        ...provided,
-        padding: 0,
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        padding: "8px 16px",
-        borderRadius: "4px",
-        cursor: "pointer",
-        backgroundColor: state.isSelected
-          ? "var(--primary-100)" // when selected
-          : state.isFocused
-          ? "var(--white)" // when hovered or keyboard-focused
-          : "var(--white)",
-        color: state.isSelected ? "var(--primary)" : "var(--text-primary)",
-        "&:active": {
-          backgroundColor: "var(--primary-100)",
-          color: "var(--primary)",
-        },
-        "&:hover": {
-          backgroundColor: "var(--primary-100)",
-          color: "var(--primary)",
-        },
-      }),
-    }),
-    [
-      contMinWidth,
-      contMaxWidth,
-      contWidth,
-      menuMinWidth,
-      menuMaxWidth,
-      menuWidth,
-      validation?.isInvalid,
-    ]
-  );
-  const mergedStyles = useMemo(() => {
-    const merged = { ...baseStyles };
-    Object.entries(stylesOverride || {}).forEach(([key, overrideFn]) => {
-      if (
-        typeof overrideFn === "function" &&
-        typeof baseStyles[key] === "function"
-      ) {
-        merged[key] = (provided, state) =>
-          overrideFn(baseStyles[key](provided, state), state);
-      } else {
-        merged[key] = overrideFn;
-      }
-    });
-    return merged;
-  }, [baseStyles, stylesOverride]);
+  const mergedClassNames = useMemo(() => {
+    return {
+      control: () => "rs-control",
+      menu: () => "rs-menu",
+      menuList: () => "rs-menu-list",
+      option: (state) =>
+        `rs-option ${state.isSelected ? "selected" : ""} ${
+          state.isFocused ? "focused" : ""
+        }`,
+      placeholder: () => "rs-placeholder",
+      singleValue: () => "rs-single-value",
+      indicatorsContainer: () => "rs-indicators",
+      input: () => "rs-input",
+      valueContainer: () => "rs-value-container",
+      dropdownIndicator: () => "rs-dropdown-indicator",
+
+      ...classNamesOverride,
+    };
+  }, [classNamesOverride]);
 
   const mergedComponents = useMemo(() => {
     if (isSearchInput) {
@@ -203,7 +109,7 @@ const CustomSelect = ({
 
       <div className="custom-select-wrapper" style={{ width: "100%" }}>
         <SelectComponent
-          className={`common-select-01 ${className}`.trim()}
+          className={className}
           classNamePrefix="select"
           defaultValue={defaultValue}
           value={value}
@@ -219,10 +125,10 @@ const CustomSelect = ({
           loadOptions={loadOptions}
           defaultOptions={loadOptions ? defaultOptions : undefined}
           cacheOptions={loadOptions ? cacheOptions : undefined}
-          styles={mergedStyles}
           components={mergedComponents}
           menuPlacement={menuPlacement}
           menuIsOpen={menuIsOpen}
+          classNames={mergedClassNames}
           {...rest}
         />
         {/* Optional Hint Text */}
