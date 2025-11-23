@@ -5,6 +5,7 @@ import {
   DownloadIcon,
   PencilIcon,
   SearchIcon,
+  TrashBinIcon,
 } from "@/icons";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -79,10 +80,6 @@ const CustomTable = ({
 
   const closeDropdown = () => setIsOpen(false);
 
-  
-
-
-
   const toggleSort = (col) => {
     if (!col.isSortable) return;
     setSortConfig((prev) => {
@@ -111,7 +108,7 @@ const CustomTable = ({
   // ------------------------------
   // 🔹 Logic For Get Module Name
   // ------------------------------
-const columnsWithIds = useMemo(
+  const columnsWithIds = useMemo(
     () =>
       columns.map((c, i) => ({
         _id: c.id || c.accessor || `col_${i}`,
@@ -119,162 +116,158 @@ const columnsWithIds = useMemo(
       })),
     [columns]
   );
-const renderCell = (row, rowIndex) => {
-  return columnsWithIds.map((col, colIndex) => {
-    const rowId = row[col.accessor];
+  const renderCell = (row, rowIndex) => {
+    return columnsWithIds.map((col, colIndex) => {
+      const rowId = row[col.accessor];
 
-    // ⭐ Resolve value
-    const value =
-      typeof col.accessor === "function"
-        ? col.accessor(row)
-        : col.accessor
-        ? row[col.accessor]
-        : null;
+      // ⭐ Resolve value
+      const value =
+        typeof col.accessor === "function"
+          ? col.accessor(row)
+          : col.accessor
+          ? row[col.accessor]
+          : null;
 
-    const content = col.cell ? col.cell(value, row, rowIndex) : value;
+      const content = col.cell ? col.cell(value, row, rowIndex) : value;
 
-    // ⭐ Common props WITHOUT key
-    const commonProps = {
-      className: `px-4 py-3 text-gray-700 text-start text-sm ${tdClass} ${
-        col.tdClassName || ""
-      }`,
-      style: { ...tdStyle, ...(col.tdStyle || {}) },
-    };
+      // ⭐ Common props WITHOUT key
+      const commonProps = {
+        className: `px-4 py-3 text-gray-700 text-start text-sm  text-theme-sm dark:text-gray-400 ${tdClass} ${
+          col.tdClassName || ""
+        }`,
+        style: { ...tdStyle, ...(col.tdStyle || {}) },
+      };
 
-    const cellKey = col._id || colIndex;
+      const cellKey = col._id || colIndex;
 
-    /* ------------------------------------------------------------------
-     * 🟡 STATUS DROPDOWN
-     * ------------------------------------------------------------------ */
-    if (col.isStatusDropdown) {
-      return (
-        <TableCell
-          key={cellKey}
-          {...commonProps}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <StatusDropdown
-            currentStatus={value}
-            salesOrderId={rowId}
-            onStatusUpdated={(newStatus) => onStatusChange(rowId, newStatus)}
-          />
-        </TableCell>
-      );
-    }
+      /* ------------------------------------------------------------------
+       * 🟡 STATUS DROPDOWN
+       * ------------------------------------------------------------------ */
+      if (col.isStatusDropdown) {
+        return (
+          <TableCell
+            key={cellKey}
+            {...commonProps}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <StatusDropdown
+              currentStatus={value}
+              salesOrderId={rowId}
+              onStatusUpdated={(newStatus) => onStatusChange(rowId, newStatus)}
+            />
+          </TableCell>
+        );
+      }
 
-    /* ------------------------------------------------------------------
-     * 🟡 ACTION BUTTONS
-     * ------------------------------------------------------------------ */
-    if (col.isActions) {
-      return (
-        <TableCell
-          key={cellKey}
-          {...commonProps}
-          className={`${commonProps.className} py-4`}
-        >
-          <div className="flex items-center gap-2">
-            {col.showEdit && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.onEdit?.(row);
-                }}
-              >
-                {/* <EditIcon size={16} /> */}
-              </button>
-            )}
+      /* ------------------------------------------------------------------
+       * 🟡 ACTION BUTTONS
+       * ------------------------------------------------------------------ */
+      if (col.isActions) {
+        return (
+          <TableCell
+            key={cellKey + 1}
+            {...commonProps}
+            className={`${commonProps.className} py-4`}
+          >
+            <div className="flex items-center gap-2">
+              {col.showEdit && (
+                <button
+                  className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(row);
+                  }}
+                >
+                  <PencilIcon size={20} />
+                </button>
+              )}
 
-            {col.showDelete && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.onDelete?.(row);
-                }}
-              >
-                {/* <DeleteIcon size={16} /> */}
-              </button>
-            )}
-          </div>
-        </TableCell>
-      );
-    }
+              {col.showDelete && (
+                <button
+                  className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(row);
+                  }}
+                >
+                  <TrashBinIcon />
+                </button>
+              )}
+            </div>
+          </TableCell>
+        );
+      }
 
-    /* ------------------------------------------------------------------
-     * 🟡 SWITCH FIELD
-     * ------------------------------------------------------------------ */
-    if (col.isSwitch) {
-      return (
-        <TableCell
-          key={cellKey}
-          {...commonProps}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Checkbox
-            type="switch"
-            checked={!!value}
-            onChange={(e) =>
-              col.onSwitchChange?.(e.target.checked, row)
-            }
-          />
-        </TableCell>
-      );
-    }
+      /* ------------------------------------------------------------------
+       * 🟡 SWITCH FIELD
+       * ------------------------------------------------------------------ */
+      if (col.isSwitch) {
+        return (
+          <TableCell
+            key={cellKey}
+            {...commonProps}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Checkbox
+              type="switch"
+              checked={!!value}
+              onChange={(e) => col.onSwitchChange?.(e.target.checked, row)}
+            />
+          </TableCell>
+        );
+      }
 
-    /* ------------------------------------------------------------------
-     * 🟡 CHECKBOX FIELD
-     * ------------------------------------------------------------------ */
-    if (col.isCheckBox) {
+      /* ------------------------------------------------------------------
+       * 🟡 CHECKBOX FIELD
+       * ------------------------------------------------------------------ */
+      if (col.isCheckBox) {
+        return (
+          <TableCell key={cellKey} {...commonProps}>
+            <Checkbox
+              checked={!!value}
+              onChange={(e) => col.onCheck?.(e.target.checked, row)}
+            />
+          </TableCell>
+        );
+      }
+
+      /* ------------------------------------------------------------------
+       * 🟡 EDITABLE CELL
+       * ------------------------------------------------------------------ */
+      if (col.isEditable) {
+        const isEditing =
+          editingCell?.rowId === rowId && editingCell?.colId === col._id;
+
+        return (
+          <TableCell
+            key={cellKey}
+            {...commonProps}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (col.renderEdit) setEditingCell({ rowId, colId: col._id });
+            }}
+          >
+            {isEditing && col.renderEdit
+              ? col.renderEdit({
+                  value,
+                  row,
+                  stopEditing: () => setEditingCell(null),
+                })
+              : content}
+          </TableCell>
+        );
+      }
+
+      /* ------------------------------------------------------------------
+       * 🟢 DEFAULT CELL
+       * ------------------------------------------------------------------ */
       return (
         <TableCell key={cellKey} {...commonProps}>
-          <Checkbox
-            checked={!!value}
-            onChange={(e) => col.onCheck?.(e.target.checked, row)}
-          />
+          {content}
         </TableCell>
       );
-    }
-
-    /* ------------------------------------------------------------------
-     * 🟡 EDITABLE CELL
-     * ------------------------------------------------------------------ */
-    if (col.isEditable) {
-      const isEditing =
-        editingCell?.rowId === rowId && editingCell?.colId === col._id;
-
-      return (
-        <TableCell
-          key={cellKey}
-          {...commonProps}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (col.renderEdit)
-              setEditingCell({ rowId, colId: col._id });
-          }}
-        >
-          {isEditing && col.renderEdit
-            ? col.renderEdit({
-                value,
-                row,
-                stopEditing: () => setEditingCell(null),
-              })
-            : content}
-        </TableCell>
-      );
-    }
-
-    /* ------------------------------------------------------------------
-     * 🟢 DEFAULT CELL
-     * ------------------------------------------------------------------ */
-    return (
-      <TableCell key={cellKey} {...commonProps}>
-        {content}
-      </TableCell>
-    );
-  });
-};
-
-
-
+    });
+  };
 
   const sortTable = (colId, type) => {
     console.log("Sorting by:", colId, type);

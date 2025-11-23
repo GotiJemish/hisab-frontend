@@ -94,7 +94,7 @@ const handleSubmit = async (e) => {
     localStorage.setItem("auth_token", access);
     localStorage.setItem("refresh_token", refresh);
     Cookies.set("auth_token", access, {
-      expires: isChecked ? 7 : 2, // if "keep me logged in" checked → 7 days
+      expires: isChecked ? 15 : 0, // if "keep me logged in" checked → 7 days
       secure: true,
       sameSite: "Lax",
     });

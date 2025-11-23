@@ -13,14 +13,14 @@ const withModal = (WrappedComponent) => {
     const {
       isOpen,
       onClose,
-      handleSubmit=()=>{},
       title = null,
       description = null,
       showCloseButton = true, // Default to true for backwards compatibility
       isFullscreen = false,
       size = "md",
       className = "",
-      
+      cancelText="cancel",
+      submitText="save"
     } = props;
 
     const modalRef = useRef(null);
@@ -113,13 +113,13 @@ useEffect(() => {
 
                 <div className="flex items-center gap-3 mt-6 sm:justify-end border-t sticky bottom-0 py-4 z-999 bg-white dark:bg-gray-900">
                   <Button
-                    title={"Close"}
+                    title={cancelText}
                     variant="outline"
                     size="model"
                     onClick={onClose}
                   />
                   <Button
-                    title={"Add Contact"}
+                    title={submitText}
                     size="model"
                     type="submit"
                   />

@@ -7,6 +7,7 @@ import Form from "../form/Form";
 import Checkbox from "../form/input/Checkbox";
 import MultiSelect from "../form/CustomSelect";
 import CustomSelect from "../form/CustomSelect";
+import { PAYMENT_TYPE } from "@/constants/common";
 const multiOptions = [
   { value: "1", label: "Option 1" },
   { value: "2", label: "Option 2" },
@@ -15,7 +16,12 @@ const multiOptions = [
   { value: "5", label: "Option 5" },
 ];
 
-const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
+const ContactModalInner = ({
+  handleSubmit,
+  setInternalSubmit,
+  editable=null,
+  submitSuccess=false,
+}) => {
   const [form, setForm] = useState({
     name: "",
     mobile: "",
@@ -24,7 +30,7 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
     pan: "",
     notes: "",
     total_amount: "",
-    payment_type: "",
+    payment_type: "receivable",
     same_as_billing: false,
   });
 
@@ -45,6 +51,72 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
   });
 
   const sameAsBilling = form.same_as_billing;
+
+  const resetForm = () => {
+    setForm({
+      name: "",
+      mobile: "",
+      email: "",
+      gst: "",
+      pan: "",
+      notes: "",
+      total_amount: "",
+      payment_type: "",
+      same_as_billing: false,
+    });
+
+    setBilling({
+      billing_address: "",
+      billing_city: "",
+      billing_state: "",
+      billing_pincode: "",
+      billing_country: "",
+    });
+
+    setShipping({
+      shipping_address: "",
+      shipping_city: "",
+      shipping_state: "",
+      shipping_pincode: "",
+      shipping_country: "",
+    });
+  };
+
+  useEffect(() => {
+    if (submitSuccess) resetForm(); // submitSuccess comes from parent
+  }, [submitSuccess]);
+  useEffect(() => {
+    if (editable) {
+      setForm({
+        name: editable.name,
+        mobile: editable.mobile,
+        email: editable.email,
+        gst: editable.gst,
+        pan: editable.pan,
+        notes: editable.notes,
+        total_amount: editable.total_amount,
+        payment_type: editable.payment_type,
+        same_as_billing: editable.same_as_billing,
+        id: editable.id, // IMPORTANT for edit mode
+      });
+
+      setBilling({
+        billing_address: editable.billing_address,
+        billing_city: editable.billing_city,
+        billing_state: editable.billing_state,
+        billing_pincode: editable.billing_pincode,
+        billing_country: editable.billing_country,
+      });
+
+      setShipping({
+        shipping_address: editable.shipping_address,
+        shipping_city: editable.shipping_city,
+        shipping_state: editable.shipping_state,
+        shipping_pincode: editable.shipping_pincode,
+        shipping_country: editable.shipping_country,
+      });
+    }
+  }, [editable]);
 
   /** --------------------------------------------------
    * SYNC SHIPPING WHEN SAME-AS-BILLING IS TRUE
@@ -67,8 +139,29 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
   const submitData = useCallback(() => {
     const payload = {
       ...form,
-      billing_address: billing,
-      shipping_address: sameAsBilling ? billing : shipping,
+      // BILLING FIELDS (flattened)
+      billing_address: billing.billing_address,
+      billing_city: billing.billing_city,
+      billing_state: billing.billing_state,
+      billing_pincode: billing.billing_pincode,
+      billing_country: billing.billing_country,
+
+      // SHIPPING (auto same as billing)
+      shipping_address: sameAsBilling
+        ? billing.billing_address
+        : shipping.shipping_address,
+      shipping_city: sameAsBilling
+        ? billing.billing_city
+        : shipping.shipping_city,
+      shipping_state: sameAsBilling
+        ? billing.billing_state
+        : shipping.shipping_state,
+      shipping_pincode: sameAsBilling
+        ? billing.billing_pincode
+        : shipping.shipping_pincode,
+      shipping_country: sameAsBilling
+        ? billing.billing_country
+        : shipping.shipping_country,
     };
 
     handleSubmit(payload);
@@ -141,7 +234,7 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
           label="GSTIN"
           type="text"
           value={form.gst}
-          onChange={(e) => handleFormChange("gst", e.target.value)}
+          onChange={(e) => handleFormChange("gst", e.target.value.toUpperCase())}
           placeholder="Enter GST Number"
           coverClass="col-span-1"
         />
@@ -152,7 +245,7 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
           label="PAN No."
           type="text"
           value={form.pan}
-          onChange={(e) => handleFormChange("pan", e.target.value)}
+          onChange={(e) => handleFormChange("pan", e.target.value.toUpperCase())}
           placeholder="Enter PAN"
           coverClass="col-span-1"
         />
@@ -315,8 +408,8 @@ const ContactModalInner = ({ handleSubmit, setInternalSubmit }) => {
           <CustomSelect
             label="Payment Type"
             id="payment_type"
-            options={multiOptions}
-            value={multiOptions.find((o) => o.value === form.payment_type)}
+            options={PAYMENT_TYPE}
+            value={PAYMENT_TYPE.find((o) => o.value === form.payment_type)}
             onChange={(opt) => handleFormChange("payment_type", opt?.value)}
             coverClass="col-span-1"
           />

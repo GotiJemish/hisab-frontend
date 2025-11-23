@@ -9,10 +9,10 @@ import AppHeader from "./AppHeader";
 import { notFound, useRouter } from "next/navigation";
 import ProtectedRoute from "@/utilities/ProtectedRoute";
 
-export default function AdminLayout({children,id}) {
-    const router = useRouter();
-      const [allowed, setAllowed] = useState(false);
-        const { user, isAuthenticated, isLoading } = useAuth();
+export default function AdminLayout({ children, id }) {
+  const router = useRouter();
+  const [allowed, setAllowed] = useState(false);
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
@@ -26,7 +26,7 @@ export default function AdminLayout({children,id}) {
         router.replace("/login");
       } else if (user?.user_id !== id) {
         // 🚫 not your page → show 404
-       notFound();
+        notFound();
       } else {
         setAllowed(true);
       }
@@ -42,21 +42,21 @@ export default function AdminLayout({children,id}) {
   }
   return allowed ? (
     <ProtectedRoute>
-    <div className="min-h-screen xl:flex">
-      {/* Sidebar and Backdrop */}
-      <AppSidebar />
-      <Backdrop />
-      {/* Main Content Area */}
-      <div
-        className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
-      >
-        {/* Header */}
-        <AppHeader />
-        {/* Page Content */}
-        {/* mx-auto max-w-(--breakpoint-2xl) */}
-        <div className="p-4 relative md:p-6">{children}</div>
+      <div className="min-h-screen xl:flex">
+        {/* Sidebar and Backdrop */}
+        <AppSidebar />
+        <Backdrop />
+        {/* Main Content Area */}
+        <div
+          className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
+        >
+          {/* Header */}
+          <AppHeader />
+          {/* Page Content */}
+          {/* mx-auto max-w-(--breakpoint-2xl) */}
+          <div className="p-4 relative md:p-6">{children}</div>
+        </div>
       </div>
-    </div>
     </ProtectedRoute>
   ) : null;
 }

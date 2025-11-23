@@ -8,32 +8,27 @@ export const MAIN_TABLE_COLUMNS = [
     title: "Name",
   },
   {
-    id: "total_amount",
-    accessor: "total_amount",
-    isSortable: true,
-    sortType: "number",
-    title: "Amount",
-  },
-  {
-    id: "payment_type",
-    accessor: "payment_type",
+    id: "type",
+    accessor: "type",
     isSortable: true,
     sortType: "text",
     title: "Payment Type",
   },
   {
-    id: "mobile",
-    accessor: "mobile",
+    id: "price",
+    accessor: "rate",
+    
     isSortable: true,
-    sortType: "text",
-    title: "Mobile",
+    sortType: "number",
+    title: "Sales Price",
   },
   {
-    id: "email",
-    accessor: "email",
+    id: "unit types",
+    accessor: "unit_type",
     isSortable: true,
     sortType: "text",
-    title: "email",
+    title: "Stock",
   },
+ 
   { id: "index", isActions: true, title: "", showEdit:true, showDelete:true },
 ];

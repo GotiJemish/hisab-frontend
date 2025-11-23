@@ -30,7 +30,7 @@ const CustomSelect = ({
   isSearchInput = false,
   isClearable = false,
   isSearchable = true,
-  isDisabled = false,
+  disabled = false,
   isLoading = false,
   defaultValue = null,
   value = null,
@@ -42,7 +42,7 @@ const CustomSelect = ({
   name = "",
   onChange = () => {},
   menuPlacement = "auto",
-  menuIsOpen = false,
+  menuIsOpen,
   label = "",
   coverClass = "",
   hiddenLabel = false,
@@ -59,7 +59,7 @@ const CustomSelect = ({
 ${isDisabled ? "opacity-50 cursor-not-allowed bg-gray-100" : "cursor-pointer"}
 ${
   isFocused
-    ? "shadow-focus-ring border-brand-300 dark:border-brand-300"
+    ? "shadow-focus-ring border-brand-300 dark:border-brand-800 ring-3 ring-brand-500/10"
     : "border-gray-300 dark:border-gray-700"
 }`,
       valueContainer: () => "flex items-center gap-2 text-sm",
@@ -69,18 +69,16 @@ ${
       singleValue: () => "text-gray-800 dark:text-gray-200 text-sm",
       menu: () =>
         "bg-white dark:bg-gray-900 mt-1 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden",
-      menuList: () => "py-1 max-h-60 overflow-y-auto",
+      menuList: () => "p-2 max-h-60 overflow-y-auto",
       option: ({ isSelected, isFocused }) =>
-        `
-          px-3 py-2 text-sm cursor-pointer 
+        `px-3 py-2 text-sm cursor-pointer rounded-lg 
           ${
             isSelected
-              ? "bg-brand-100 text-brand-700 dark:bg-brand-800/30"
+              ? "bg-brand-100 text-brand-700 dark:bg-brand-800/30 dark:text-white/90"
               : isFocused
-              ? "bg-gray-100 dark:bg-gray-800"
+              ? "bg-gray-100 dark:bg-gray-800 dark:text-white/90"
               : "text-gray-700 dark:text-gray-200"
-          }
-        `,
+          }`,
       dropdownIndicator: () =>
         "px-2 text-gray-600 dark:text-gray-300 flex items-center",
       clearIndicator: () => "px-2 text-gray-500 hover:text-red-500",
@@ -121,7 +119,7 @@ ${
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        isDisabled={isDisabled}
+        isDisabled={disabled}
         isLoading={isLoading}
         isClearable={isClearable}
         isSearchable={isSearchable}
@@ -139,18 +137,18 @@ ${
       />
 
       {hint && (
-          <p
-            className={`mt-1.5 text-xs ${
-              error
-                ? "text-error-500"
-                : success
-                ? "text-success-500"
-                : "text-gray-500"
-            }`}
-          >
-            {hint}
-          </p>
-        )}
+        <p
+          className={`mt-1.5 text-xs ${
+            error
+              ? "text-error-500"
+              : success
+              ? "text-success-500"
+              : "text-gray-500"
+          }`}
+        >
+          {hint}
+        </p>
+      )}
     </div>
   );
 };
