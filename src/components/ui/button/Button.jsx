@@ -10,6 +10,8 @@ const Button = ({
   className = "",
   disabled = false,
   type = "button",
+  as: Component = "button",
+  ...rest
 }) => {
   // Size Classes
   const sizeClasses = {
@@ -30,7 +32,7 @@ const Button = ({
     error: "text-white bg-error-500 shadow-theme-xs hover:bg-error-600",
   };
   return (
-    <button
+    <Component
       className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} ${
         sizeClasses[size]
       } ${variantClasses[variant]} ${
@@ -39,11 +41,12 @@ const Button = ({
       onClick={onClick}
       disabled={disabled}
       type={type}
+      {...rest}
     >
       {startIcon && <span className="flex items-center">{startIcon}</span>}
       {title}
       {endIcon && <span className="flex items-center">{endIcon}</span>}
-    </button>
+    </Component>
   );
 };
 

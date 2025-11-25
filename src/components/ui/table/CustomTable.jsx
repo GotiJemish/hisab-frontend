@@ -28,10 +28,11 @@ import Checkbox from "@/components/form/input/Checkbox";
 const CustomTable = ({
   style = {},
   action = {},
-
+coverClass="",
   columns = [],
   data = [],
   loading = false,
+  hasBg=false,
   keyField = "id",
   emptyMessage = "No records found",
   rowClick = () => {},
@@ -132,9 +133,7 @@ const CustomTable = ({
 
       // ⭐ Common props WITHOUT key
       const commonProps = {
-        className: `px-4 py-3 text-gray-700 text-start text-sm  text-theme-sm dark:text-gray-400 ${tdClass} ${
-          col.tdClassName || ""
-        }`,
+        className: `p-4 whitespace-nowrap ${tdClass} ${col.tdClassName || ""}`,
         style: { ...tdStyle, ...(col.tdStyle || {}) },
       };
 
@@ -263,7 +262,7 @@ const CustomTable = ({
        * ------------------------------------------------------------------ */
       return (
         <TableCell key={cellKey} {...commonProps}>
-          {content}
+          <p className="text-sm text-gray-700 dark:text-gray-400">{content}</p>
         </TableCell>
       );
     });
@@ -273,150 +272,165 @@ const CustomTable = ({
     console.log("Sorting by:", colId, type);
   };
   return (
-    <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <Table className={`min-w-full ${className}`} style={tableStyle}>
-          <TableHeader
-            className={`border-b border-gray-100 dark:border-white/[0.05] ${headClass}`}
-            style={headStyle}
+    <>
+      <div
+        className={`overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 ${
+          hasBg ? "bg-white dark:bg-white/[0.03]" : ""
+        } ${coverClass}`}
+      >
+        <div className="max-w-full overflow-x-auto custom-scrollbar">
+          <Table
+            className={`w-full table-auto ${className}`}
+            style={tableStyle}
           >
-            <TableRow className={headTrClass} style={headTrStyle}>
-              {isSelectable && (
-                <TableCell
-                  isHeader
-                  className={`px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 ${thClass}`}
-                  style={{ ...thStyle }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Checkbox labelHidden />
-                </TableCell>
-              )}
-              {columns?.map((col, i) => (
-                <TableCell
-                  key={i}
-                  isHeader
-                  className={`px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 ${thClass} ${
-                    col.className || ""
-                  } ${col.isSortable ? "cursor-pointer" : ""}`}
-                  style={{ ...thStyle, ...col.style }}
-                  onClick={
-                    col.isSortable
-                      ? (e) => {
-                          e.stopPropagation();
-                          sortTable(id, col.sortType);
-                        }
-                      : undefined
-                  }
-                >
-                  <div
-                    className={`flex items-center ${
-                      col.isSortable ? "justify-between" : ""
-                    }`}
+            <TableHeader
+              className={`border-b border-gray-100 dark:border-white/[0.05] ${headClass}`}
+              style={headStyle}
+            >
+              <TableRow
+                className={`border-b border-gray-200 dark:divide-gray-800 dark:border-gray-800 ${headTrClass}`}
+                style={headTrStyle}
+              >
+                {isSelectable && (
+                  <TableCell
+                    isHeader
+                    className={`p-4 whitespace-nowrap ${thClass}`}
+                    style={{ ...thStyle }}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {col.title}
-                    {col.isSortable && (
-                      <div>
-                        <AngleUpIcon className="fill-gray-300 dark:fill-gray-700 mb-1" />
-                        <AngleUpIcon className="fill-gray-300 dark:fill-gray-700 -rotate-180" />
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHeader>
-
-          <TableBody
-            className={`divide-y divide-gray-100 dark:divide-white/[0.05] ${bodyClass}`}
-            style={bodyStyle}
-          >
-            {loading || data.length === 0 ? (
-              <TableRow className={trClass} style={trStyle}>
-                <TableCell
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                  colSpan={columnsWithIds.length}
-                >
-                  {loading && "loading"}
-                  {data.length === 0 && "No Records Found"}
-                  {/* <div className="text-center py-3 h-100 d-flex align-items-center justify-content-center">
-                    <Spinner animation="border" />
-                  </div> */}
-                </TableCell>
-              </TableRow>
-            ) : (
-              <>
-                {data?.map((row, idx) => {
-                  return (
-                    <TableRow
-                      style={trStyle}
-                      key={idx}
-                      onClick={(e) => {
-                        // e.stopPropagation();
-                        // if (e.target.closest(".action-dropdown")) return;
-                        // rowClick(row);
-                      }}
-                      className={`${trClass} ${
-                        "selected-row"
-                        // isRowSelected(idx) ? "" : ""
+                    <Checkbox labelHidden />
+                  </TableCell>
+                )}
+                {columns?.map((col, i) => (
+                  <TableCell
+                    key={i}
+                    isHeader
+                    className={`p-4 whitespace-nowrap ${thClass} ${
+                      col.className || ""
+                    } ${col.isSortable ? "cursor-pointer" : ""}`}
+                    style={{ ...thStyle, ...col.style }}
+                    onClick={
+                      col.isSortable
+                        ? (e) => {
+                            e.stopPropagation();
+                            sortTable(id, col.sortType);
+                          }
+                        : undefined
+                    }
+                  >
+                    <div
+                      className={`flex items-center  ${
+                        col.isSortable ? "gap-3" : ""
                       }`}
                     >
-                      {isSelectable && (
-                        <TableCell
-                          className="px-5 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Checkbox
-                            labelHidden
-                            checked={selectedIds.includes(row[keyField])}
-                            onChange={(e) =>
-                              onToggle(row[keyField], e.target.checked)
-                            }
-                          />
-                        </TableCell>
+                      <p className="text-theme-xs font-medium text-gray-700 dark:text-gray-400">
+                        {col.title}
+                      </p>
+                      {col.isSortable && (
+                        <div className="flex flex-col gap-0.5">
+                          {/* sortBy === 'customer' && sortDirection === 'asc' ? 'text-brand-500' : 'text-gray-300' */}
+                          <AngleUpIcon className="text-gray-300" />
+                          <AngleUpIcon className="text-gray-300 -rotate-180" />
+                        </div>
                       )}
-                      {renderCell(row, idx)}
+                    </div>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHeader>
 
-                      <TableCell
-                        className="px-5 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400"
-                        onClick={(e) => e.stopPropagation()}
-                      ></TableCell>
-                    </TableRow>
-                  );
-                })}
-              </>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
-          <div className="pb-3 xl:pb-0">
-            <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
-              Showing 1 to 5 of 10 entries
-            </p>
-          </div>
-          <div className="flex items-center justify-center">
-            <button
-              className="mr-2.5 flex items-center h-10 justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] text-sm"
-              disabled
+            <TableBody
+              className={`divide-y divide-gray-100 dark:divide-white/[0.05]  ${bodyClass}`}
+              style={bodyStyle}
             >
-              Previous
-            </button>
-            <div className="flex items-center gap-2">
-              <button className="px-4 py-2 rounded bg-brand-500 text-white flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500">
-                1
+              {loading || data.length === 0 ? (
+                <TableRow className={trClass} style={trStyle}>
+                  <TableCell
+                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    colSpan={columnsWithIds.length}
+                  >
+                    {loading && "loading"}
+                    {data.length === 0 && "No Records Found"}
+                    {/* <div className="text-center py-3 h-100 d-flex align-items-center justify-content-center">
+                    <Spinner animation="border" />
+                  </div> */}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {data?.map((row, idx) => {
+                    return (
+                      <TableRow
+                        style={trStyle}
+                        key={idx}
+                        onClick={(e) => {
+                          // e.stopPropagation();
+                          // if (e.target.closest(".action-dropdown")) return;
+                          // rowClick(row);
+                        }}
+                        className={`transition hover:bg-gray-50 dark:hover:bg-gray-900 ${trClass} ${
+                          "selected-row"
+                          // isRowSelected(idx) ? "" : ""
+                        }`}
+                      >
+                        {isSelectable && (
+                          <TableCell
+                            className="p-4 whitespace-nowrap"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Checkbox
+                              labelHidden
+                              checked={selectedIds.includes(row[keyField])}
+                              onChange={(e) =>
+                                onToggle(row[keyField], e.target.checked)
+                              }
+                            />
+                          </TableCell>
+                        )}
+                        {renderCell(row, idx)}
+
+                        <TableCell
+                          className="p-4 whitespace-nowrap"
+                          onClick={(e) => e.stopPropagation()}
+                        ></TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="border-t rounded-b-xl border-gray-100 py-4  px-4 dark:border-white/[0.05]">
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
+            <div className="pb-3 xl:pb-0">
+              <p className="pb-3 text-sm font-medium text-center text-gray-500 border-b border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-b-0 xl:pb-0 xl:text-left">
+                Showing 1 to 5 of 10 entries
+              </p>
+            </div>
+            <div className="flex items-center justify-center">
+              <button
+                className="mr-2.5 flex items-center h-10 justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] text-sm"
+                disabled
+              >
+                Previous
               </button>
-              <button className="px-4 py-2 rounded text-gray-700 dark:text-gray-400 flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500">
-                2
+              <div className="flex items-center gap-2">
+                <button className="px-4 py-2 rounded bg-brand-500 text-white flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500">
+                  1
+                </button>
+                <button className="px-4 py-2 rounded text-gray-700 dark:text-gray-400 flex w-10 items-center justify-center h-10 rounded-lg text-sm font-medium hover:bg-blue-500/[0.08] hover:text-brand-500 dark:hover:text-brand-500">
+                  2
+                </button>
+              </div>
+              <button className="ml-2.5 flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+                Next
               </button>
             </div>
-            <button className="ml-2.5 flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-gray-700 shadow-theme-xs text-sm hover:bg-gray-50 h-10 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
-              Next
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

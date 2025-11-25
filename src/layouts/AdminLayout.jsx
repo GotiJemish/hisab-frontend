@@ -29,6 +29,7 @@ export default function AdminLayout({ children, id }) {
         notFound();
       } else {
         setAllowed(true);
+        localStorage.setItem("userId",id)
       }
     }
   }, [isAuthenticated, isLoading, user, id, router]);

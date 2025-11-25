@@ -175,6 +175,7 @@ const ContactsModule = () => {
           isSelectable={true}
           columns={MAIN_TABLE_COLUMNS}
           hasActions
+          hasBg
           data={contacts}
           hasmultipleActions
           action={{

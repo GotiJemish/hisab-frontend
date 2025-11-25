@@ -157,6 +157,7 @@ const ItemsModule = () => {
         columns={MAIN_TABLE_COLUMNS}
         hasActions
         hasmultipleActions
+        hasBg
         action={{
           onEdit: handleEdit,
           onDelete: (row) => handleDelete(row.id),

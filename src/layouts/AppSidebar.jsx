@@ -11,6 +11,7 @@ import {
   ContactIcon,
   GridIcon,
   HorizontaLDots,
+  InvoiceIcon,
   ItemIcon,
   ListIcon,
   PageIcon,
@@ -50,7 +51,11 @@ const AppSidebar = () => {
       name: "Items",
       path: "/items",
     },
-
+ {
+      icon: <InvoiceIcon />,
+      name: "Invoice",
+      path: "/invoice",
+    },
     {
       icon: <CalenderIcon />,
       name: "Calendar",

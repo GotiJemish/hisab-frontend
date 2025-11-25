@@ -756,6 +756,23 @@ const ItemIcon = ({ size = 24 }) => (
   </svg>
 );
 
+const InvoiceIcon = ({ size = 24 }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    xmlSpace="preserve"
+  >
+    <g>
+      <path
+        d="M13.75 12a.75.75 0 0 1-.75.75H7a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75zM7 8.75h3a.75.75 0 0 0 0-1.5H7a.75.75 0 0 0 0 1.5zm6 6.5H7a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm8.75-3.75V19A2.752 2.752 0 0 1 19 21.75H6A3.383 3.383 0 0 1 2.25 18V6A3.383 3.383 0 0 1 6 2.25h8A3.383 3.383 0 0 1 17.75 6v3.25h1.75a2.253 2.253 0 0 1 2.25 2.25zm-5.2 8.75a2.723 2.723 0 0 1-.3-1.25V6c0-1.577-.673-2.25-2.25-2.25H6c-1.577 0-2.25.673-2.25 2.25v12c0 1.577.673 2.25 2.25 2.25zm3.7-8.75a.751.751 0 0 0-.75-.75h-1.75V19a1.25 1.25 0 0 0 2.5 0z"
+        fill="currentColor"
+      />
+    </g>
+  </svg>
+);
+
 import BoxIcon from "./box.svg";
 import CheckCircleIcon from "./check-circle.svg";
 
@@ -851,4 +868,5 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  InvoiceIcon,
 };
