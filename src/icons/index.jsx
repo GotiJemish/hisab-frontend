@@ -212,13 +212,14 @@ const GroupIcon = () => (
   </svg>
 );
 
-const InfoIcon = () => (
+const InfoIcon = ({size=24,className=""}) => (
   <svg
-    width={24}
-    height={24}
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    className={className}
   >
     <path
       fillRule="evenodd"
@@ -694,21 +695,24 @@ const CloseIcon = (props) => (
 );
 
 const PlusIcon = ({ size = 20, className = "" }) => (
+
+
+
   <svg
-    xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
+    xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
     <path
-      d="M5 10.0002H15.0006M10.0002 5V15.0006"
+      d="M6.66699 12.0002H18.6677M12.6672 6V18.0007"
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    ></path>
   </svg>
 );
 const PencilIcon = ({ size = 21 }) => (
@@ -727,12 +731,13 @@ const PencilIcon = ({ size = 21 }) => (
     />
   </svg>
 );
-const TrashBinIcon = ({ size = 20 }) => (
+const TrashBinIcon = ({ size = 20,className="" }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 20 20"
     fill="none"
+    className={className}
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
@@ -772,6 +777,59 @@ const InvoiceIcon = ({ size = 24 }) => (
     </g>
   </svg>
 );
+const PrintIcon = ({ size = 20, className = "" }) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M6.99578 4.08398C6.58156 4.08398 6.24578 4.41977 6.24578 4.83398V6.36733H13.7542V5.62451C13.7542 5.42154 13.672 5.22724 13.5262 5.08598L12.7107 4.29545C12.5707 4.15983 12.3835 4.08398 12.1887 4.08398H6.99578ZM15.2542 6.36902V5.62451C15.2542 5.01561 15.0074 4.43271 14.5702 4.00891L13.7547 3.21839C13.3349 2.81151 12.7733 2.58398 12.1887 2.58398H6.99578C5.75314 2.58398 4.74578 3.59134 4.74578 4.83398V6.36902C3.54391 6.41522 2.58374 7.40415 2.58374 8.61733V11.3827C2.58374 12.5959 3.54382 13.5848 4.74561 13.631V15.1665C4.74561 16.4091 5.75297 17.4165 6.99561 17.4165H13.0041C14.2467 17.4165 15.2541 16.4091 15.2541 15.1665V13.6311C16.456 13.585 17.4163 12.596 17.4163 11.3827V8.61733C17.4163 7.40414 16.4561 6.41521 15.2542 6.36902ZM4.74561 11.6217V12.1276C4.37292 12.084 4.08374 11.7671 4.08374 11.3827V8.61733C4.08374 8.20312 4.41953 7.86733 4.83374 7.86733H15.1663C15.5805 7.86733 15.9163 8.20312 15.9163 8.61733V11.3827C15.9163 11.7673 15.6269 12.0842 15.2541 12.1277V11.6217C15.2541 11.2075 14.9183 10.8717 14.5041 10.8717H5.49561C5.08139 10.8717 4.74561 11.2075 4.74561 11.6217ZM6.24561 12.3717V15.1665C6.24561 15.5807 6.58139 15.9165 6.99561 15.9165H13.0041C13.4183 15.9165 13.7541 15.5807 13.7541 15.1665V12.3717H6.24561Z"
+      fill="currentColor"
+    ></path>
+  </svg>
+)
+const MinusIcon = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M6.66699 12H18.6677"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    ></path>
+  </svg>
+)
+const SaveIcon=({ size = 20, className = "" })=>(
+   <svg
+                xmlns="http://www.w3.org/2000/svg"
+               width={size}
+    height={size}
+                viewBox="0 0 20 20"
+                fill="none"
+                className={className}
+              >
+                <path
+                  d="M13.333 16.6666V12.9166C13.333 12.2262 12.7734 11.6666 12.083 11.6666L7.91634 11.6666C7.22599 11.6666 6.66634 12.2262 6.66634 12.9166L6.66635 16.6666M9.99967 5.83325H6.66634M15.4163 16.6666H4.58301C3.89265 16.6666 3.33301 16.1069 3.33301 15.4166V4.58325C3.33301 3.8929 3.89265 3.33325 4.58301 3.33325H12.8171C13.1483 3.33325 13.4659 3.46468 13.7003 3.69869L16.2995 6.29384C16.5343 6.52832 16.6662 6.84655 16.6662 7.17841L16.6663 15.4166C16.6663 16.1069 16.1066 16.6666 15.4163 16.6666Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></path>
+              </svg>
+)
 
 import BoxIcon from "./box.svg";
 import CheckCircleIcon from "./check-circle.svg";
@@ -821,6 +879,7 @@ export {
   CheckCircleIcon,
   AlertIcon,
   InfoIcon,
+  SaveIcon,
   AlertWarning,
   XIcon,
   AlertError,
@@ -868,5 +927,7 @@ export {
   HorizontaLDots,
   ChevronUpIcon,
   ChatIcon,
+  PrintIcon,
+  MinusIcon,
   InvoiceIcon,
 };

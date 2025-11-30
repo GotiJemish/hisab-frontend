@@ -19,9 +19,9 @@ export const getAllInvoices = async () => {
 // -----------------------------------------------------
 // CREATE ITEM
 // -----------------------------------------------------
-export const createItem = async (payload) => {
+export const createInvoice = async (payload) => {
   try {
-    const res = await apiClient.post(`/items/`, payload);
+    const res = await apiClient.post(`/invoices/`, payload);
     return extractResponse(res);
   } catch (error) {
     handleApiError(error, "Failed to create item");
@@ -32,12 +32,22 @@ export const createItem = async (payload) => {
 // -----------------------------------------------------
 // UPDATE
 // -----------------------------------------------------
-export const updateItem = async (id, payload) => {
+export const getInvoice = async (id) => {
   try {
-    const res = await apiClient.put(`/items/${id}/`, payload);
+    const res = await apiClient.get(`/invoices/${id}/`);
     return extractResponse(res);
   } catch (error) {
-    handleApiError(error, "Failed to update item");
+    handleApiError(error, "Failed to fetch invoice");
+    throw error;
+  }
+};
+
+export const updateInvoice = async (id, payload) => {
+  try {
+    const res = await apiClient.put(`/invoices/${id}/`, payload);
+    return extractResponse(res);
+  } catch (error) {
+    handleApiError(error, "Failed to update invoice");
     throw error;
   }
 };
@@ -45,12 +55,12 @@ export const updateItem = async (id, payload) => {
 // -----------------------------------------------------
 // DELETE
 // -----------------------------------------------------
-export const deleteItemApi = async (id) => {
+export const deleteInvoice = async (id) => {
   try {
-    const res = await apiClient.delete(`/items/${id}/`);
+    const res = await apiClient.delete(`/invoices/${id}/`);
     return extractResponse(res);
   } catch (error) {
-    handleApiError(error, "Failed to delete item");
+    handleApiError(error, "Failed to delete invoice");
     throw error;
   }
 };
