@@ -18,6 +18,8 @@ const Button = ({
     model: "px-4 py-2.5 text-sm",
     sm: "px-4 py-3 text-sm",
     md: "px-5 py-3.5 text-sm",
+    lg: "px-6 py-4 text-base",
+    xl: "px-7 py-5 text-lg",
   };
 
   // Variant Classes
@@ -30,14 +32,15 @@ const Button = ({
     info:"text-white bg-blue-light-500 shadow-theme-xs hover:bg-blue-light-600",
     warning:"text-white bg-warning-500 shadow-theme-xs hover:bg-warning-600",
     error: "text-white bg-error-500 shadow-theme-xs hover:bg-error-600",
+    link:"text-gray-700 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-0"
   };
   return (
     <Component
-      className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} ${
-        sizeClasses[size]
-      } ${variantClasses[variant]} ${
-        disabled ? "cursor-not-allowed opacity-50" : ""
-      }`}
+     className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} 
+  ${variant === "link" ? "p-0" : sizeClasses[size]}
+  ${variantClasses[variant]}  
+  ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+
       onClick={onClick}
       disabled={disabled}
       type={type}

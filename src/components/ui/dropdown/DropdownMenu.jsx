@@ -2,7 +2,7 @@
 import React from "react";
 import { useEffect, useRef } from "react";
 
-export const Dropdown = ({ isOpen, onClose, children, className = "" }) => {
+export const DropdownMenu = ({ isOpen, onClose, children, className = "" }) => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {

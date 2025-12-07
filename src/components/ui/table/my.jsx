@@ -45,8 +45,8 @@ import {
 import Badge from "@/components/ui/badge/Badge";
 import Image from "next/image";
 import Checkbox from "@/components/form/input/Checkbox";
-import { Dropdown } from "@/components/ui/dropdown/Dropdown";
-import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
+import { DropdownMenu } from "@/components/ui/dropdown/DropdownMenu";
+import { DropdownItem } from "@/components/ui/dropdown/UiDropdownItem";
 import { ChevronDownIcon, DownloadIcon, SearchIcon, ThreeDotIcon } from "@/icons";
 
 // Define the table data using the interface
@@ -190,7 +190,7 @@ const MainTable = () => {
                   strokeLinejoin="round"
                 />
               </svg> */}
-              <ChevronDownIcon className="stroke-current"/>
+              <ChevronDownIcon className="stroke-current" />
             </span>
           </div>
           <span className="text-gray-500 dark:text-gray-400"> entries </span>
@@ -198,7 +198,7 @@ const MainTable = () => {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative">
             <button className="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2 dark:text-gray-400">
-            <SearchIcon className="fill-current"/>
+              <SearchIcon className="fill-current" />
             </button>
             <input
               x-model="search"
@@ -209,7 +209,7 @@ const MainTable = () => {
           </div>
           <button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03] dark:hover:text-gray-300">
             Download
-           <DownloadIcon className="fill-current"/>
+            <DownloadIcon className="fill-current" />
           </button>
         </div>
       </div>
@@ -313,8 +313,8 @@ const MainTable = () => {
                       order.status === "Active"
                         ? "success"
                         : order.status === "Pending"
-                        ? "warning"
-                        : "error"
+                          ? "warning"
+                          : "error"
                     }
                   >
                     {order.status}
@@ -331,9 +331,9 @@ const MainTable = () => {
                         className="text-gray-500 dark:text-gray-400 "
                         onClick={toggleDropdown}
                       >
-                       <ThreeDotIcon className="fill-current"/>
+                        <ThreeDotIcon className="fill-current" />
                       </button>
-                      <Dropdown
+                      <DropdownMenu
                         isOpen={isOpen}
                         onClose={closeDropdown}
                         className="absolute z-10 right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
@@ -351,13 +351,13 @@ const MainTable = () => {
                           </li>
                         </ul>
                         <button
-                          onClick={() => {}}
+                          onClick={() => { }}
                           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
                           {/* <SignOutIcon className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"/> */}
                           Delete
                         </button>
-                      </Dropdown>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </TableCell>

@@ -1,38 +1,73 @@
-import  React from "react";
+import React from "react";
 import Link from "next/link";
 
-
-
-export const DropdownItem = ({
-  tag = "button",
-  href,
+const DropdownItem = ({
+  as = "button",       // button | a | link
+  href = "",
   onClick,
-  onItemClick,
-  baseClassName = "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+  disabled = false,
+  variant = "default",  // default | danger | success | custom
+  size = "md",          // sm | md | lg
   className = "",
+  baseClassName = "",
+  leftIcon,
+  rightIcon,
   children,
+  ...rest
 }) => {
-  const combinedClasses = `${baseClassName} ${className}`.trim();
-
-  const handleClick = (event) => {
-    if (tag === "button") {
-      event.preventDefault();
-    }
-    if (onClick) onClick();
-    if (onItemClick) onItemClick();
+  const variants = {
+    default: "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+    danger: "text-red-600 hover:bg-red-100 hover:text-red-700",
+    success: "text-green-600 hover:bg-green-100 hover:text-green-700",
+    custom: "",
   };
 
-  if (tag === "a" && href) {
+  const sizes = {
+    sm: "px-2 py-1 text-xs",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
+
+  const finalClasses = `
+    block w-full text-left 
+    ${sizes[size]}
+    ${variants[variant]}
+    ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+    ${baseClassName}
+    ${className}
+  `.replace(/\s+/g, " ").trim();
+
+  const handleClick = (event) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+    if (onClick) onClick(event);
+  };
+
+  // If tag is LINK
+  if (as === "link") {
     return (
-      <Link href={href} className={combinedClasses} onClick={handleClick}>
-        {children}
+      <Link href={href} className={finalClasses} {...rest}>
+        <span className="flex items-center gap-2">
+          {leftIcon}
+          {children}
+          {rightIcon}
+        </span>
       </Link>
     );
   }
 
+  // Default: BUTTON
   return (
-    <button onClick={handleClick} className={combinedClasses}>
-      {children}
+    <button className={finalClasses} onClick={handleClick} disabled={disabled} {...rest}>
+      <span className="flex items-center gap-2">
+        {leftIcon}
+        {children}
+        {rightIcon}
+      </span>
     </button>
   );
 };
+
+export default DropdownItem;

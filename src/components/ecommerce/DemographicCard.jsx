@@ -4,8 +4,8 @@ import Image from "next/image";
 import CountryMap from "./CountryMap";
 import { useState } from "react";
 import { MoreDotIcon } from "@/icons";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { DropdownMenu } from "../ui/dropdown/DropdownMenu";
+import { DropdownItem } from "../ui/dropdown/UiDropdownItem";
 
 export default function DemographicCard() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function DemographicCard() {
           <button onClick={toggleDropdown} className="dropdown-toggle">
             <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
           </button>
-          <Dropdown
+          <DropdownMenu
             isOpen={isOpen}
             onClose={closeDropdown}
             className="w-40 p-2"
@@ -51,7 +51,7 @@ export default function DemographicCard() {
             >
               Delete
             </DropdownItem>
-          </Dropdown>
+          </DropdownMenu>
         </div>
       </div>
       <div className="px-4 py-6 my-6 overflow-hidden border border-gary-200 rounded-2xl bg-gray-50 dark:border-gray-800 dark:bg-gray-900 sm:px-6">

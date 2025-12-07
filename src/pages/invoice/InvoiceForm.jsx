@@ -1,401 +1,459 @@
 "use client"
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import CustomSelect from "@/components/form/CustomSelect";
-import Form from "@/components/form/Form";
-import InputField from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
+import React, { useEffect, useState, useTransition } from "react";
+
+import {
+  PlusIcon,
+  MinusIcon,
+  TrashBinIcon,
+  EyeIcon,
+  SaveIcon,
+  InfoIcon,
+} from "@/icons";
+
+
+
+
+import { createInvoice, getInvoiceNumber } from "@/apis/invoice";
+import { getAllContacts } from "@/apis/contacts";
+import { getAllItems } from "@/apis/items";
 import Button from "@/components/ui/button/Button";
-import { EyeIcon, InfoIcon, MinusIcon, PlugInIcon, PlusIcon, SaveIcon, TrashBinIcon } from "@/icons";
-import React, { useActionState, useState, useTransition } from "react";
-export const invoiceTypeOptions = [{ value: 'default', label: 'Default' },
-{ value: 'delivery_challan', label: 'Delivery Challan' },
-{ value: 'old_dc', label: 'OLD DC' }]
-export const supplyTypeOptions = [{ value: 'regular', label: 'Regular' },
-{ value: 'bill_to_ship_to', label: 'Bill To - Ship To' },
-{ value: 'bill_from_dispatch_from', label: 'Bill From - Dispatch From' },
-{ value: 'a_party', label: '4 Party Transaction' }]
-export const paymentConditions = [
-  { value: "", label: "Select Payment Condition" },
-  { value: "net-7", label: "Net 7 Days" },
-  { value: "net-15", label: "Net 15 Days" },
-  { value: "net-30", label: "Net 30 Days" },
-  { value: "net-60", label: "Net 60 Days" },
-  { value: "net-90", label: "Net 90 Days" },
-  { value: "due-on-receipt", label: "Due on Receipt" },
-  { value: "cash-on-delivery", label: "Cash on Delivery (COD)" },
-];
-export const currencyOptions = [
-  { value: "", label: "Select Currency" },
-  { value: "usd", label: "United States Dollar (USD)" },
-  { value: "eur", label: "Euro (EUR)" },
-  { value: "gbp", label: "British Pound (GBP)" },
-  { value: "jpy", label: "Japanese Yen (JPY)" },
-  { value: "cad", label: "Canadian Dollar (CAD)" },
-  { value: "aud", label: "Australian Dollar (AUD)" },
-  { value: "chf", label: "Swiss Franc (CHF)" },
-  { value: "cny", label: "Chinese Yuan (CNY)" },
-  { value: "inr", label: "Indian Rupee (INR)" },
-];
-export const discountOptions = [
-  { value: 0, label: "0%" },
-  { value: 10, label: "10%" },
-  { value: 20, label: "20%" },
-  { value: 50, label: "50%" },
-];
-export const itemsOption = [{ value: "", label: "Select Currency" },
-{ value: "usd", label: "United States Dollar (USD)" },
-{ value: "eur", label: "Euro (EUR)" },]
+import CustomSelect from "@/components/form/CustomSelect";
+import InputField from "@/components/form/input/InputField";
+import Form from "@/components/form/Form";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import Label from "@/components/form/Label";
+import { invoiceTypeOptions, supplyTypeOptions, discountOptions } from "./data";
+import { dateFormate } from "@/utilities/functions";
+import { useLoading } from "@/context/LoadingContext";
+import { useToast } from "@/context/ToastContext";
+import { useRouter } from "next/navigation";
+
 
 const InvoiceForm = () => {
-  const [addItem, setAddItem] = useState(false);
-  const [invoiceItems, setInvoiceItems] = useState([]);
+  const { showToast } = useToast();
+  const date = dateFormate(new Date(), "YYYY-MM-DD");
 
-  const [loading, setLoading] = useState(false);
+  const { loading, setLoading } = useLoading();
+const router=useRouter();
+  const [invoiceItems, setInvoiceItems] = useState([]);
+  const [invoiceNoData, setInvoiceNoData] = useState(null);
+  const [invoiceNo, setInvoiceNo] = useState("");
+
+  const [formPayload, setFormPayload] = useState({
+    invoice_type: "",
+    supply_type: "",
+    invoice_date: date,
+    contact: "",
+    notes: "",
+    internal_note: "",
+  });
+
+  const [addItem, setAddItem] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // ─────────────────────────────────────────────
-  // SAVE PRODUCT HANDLER
-  // ─────────────────────────────────────────────
-  const handleAddItem = (payload) => {
+  const [item, setItem] = useState({
+    item: null,
+    quantity: 1,
+    rate: "",
+    discount: "",
+  });
+
+
+  /* ------------------------------ Fetch Invoice No ------------------------------ */
+  const fetchInvoiceNo = async () => {
+    try {
+      const res = await getInvoiceNumber(date);
+      setInvoiceNoData(res.data);
+      setInvoiceNo(res.data.next_invoice_number);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchInvoiceNo();
+  }, [date]);
+
+  /* ------------------------------ Load Contact Options ------------------------------ */
+  const loadContactOptions = async (input) => {
+    const res = await getAllContacts();
+    return res.data
+      .filter((c) => c.name.toLowerCase().includes(input.toLowerCase()))
+      .map((c) => ({ label: c.name, value: c.id }));
+  };
+
+  /* ------------------------------ Load Item Options ------------------------------ */
+  const loadItemOptions = async (input) => {
+    const res = await getAllItems();
+    console.log(res.data);
+
+    return res.data
+      .filter((c) => c.name.toLowerCase().includes(input.toLowerCase()))
+      .map((c) => ({ label: c.name, value: c.id }));
+  };
+
+  /* ------------------------------ Update Form Fields ------------------------------ */
+  const updateForm = (key, value) => {
+    setFormPayload((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const updateItemField = (key, value) => {
+    setItem((prev) => ({ ...prev, [key]: value }));
+  };
+
+  /* ------------------------------ Qty Controls ------------------------------ */
+  const incrementQty = () =>
+    updateItemField("quantity", Number(item.quantity) + 1);
+
+  const decrementQty = () =>
+    item.quantity > 1 &&
+    updateItemField("quantity", Number(item.quantity) - 1);
+
+  /* ------------------------------ Save Item ------------------------------ */
+  const handleSaveItem = () => {
+    if (!item.item || !item.rate) {
+      showToast({ message: "Please fill item details", type: "error" });
+      return;
+    }
+
+    const payload = {
+      item: item.item.label,
+      qty: Number(item.quantity),
+      rate: Number(item.rate),
+      discount: Number(item.discount || 0),
+    };
+
     setInvoiceItems((prev) => [...prev, payload]);
     setAddItem(false);
+
+    setItem({
+      item: null,
+      quantity: 1,
+      rate: "",
+      discount: "",
+    });
   };
-  // ─────────────────────────────────────────────
-  // SAVE INVOICE HANDLER
-  // ─────────────────────────────────────────────
-  const submitInvoice = async (payload) => {
+
+  /* ------------------------------ Submit Invoice ------------------------------ */
+  const submitInvoice = async () => {
     try {
       setLoading(true);
 
-      const dataToSend = {
-        ...payload,
-        items: invoiceItems,
+      const finalPayload = {
+        invoice_number: invoiceNo,
+        contact: formPayload.contact?.value,
+        invoice_type: formPayload.invoice_type?.value,
+        supply_type: formPayload.supply_type?.value,
+        invoice_date: formPayload.invoice_date,
+        notes: formPayload.notes || "",
+        internal_note: formPayload.internal_note || "",
+        items: invoiceItems.map((i) => ({
+          item: i.item,
+          description: i.item,
+          quantity: i.qty,
+          rate: i.rate,
+          discount: i.discount,
+        })),
       };
 
-      const res = await createInvoice(dataToSend);
+      const res = await createInvoice(finalPayload);
 
-      if (res?.success) {
-        showToast({
-          message: "Invoice Created!",
-          type: "success",
-        });
+      if (res.success) {
+        showToast({ message: "Invoice Created!", type: "success" });
+        setFormPayload({
+          invoice_type: "",
+          supply_type: "",
+          invoice_date: "",
+          contact: "",
+          notes: "",
+          internal_note: "",
+        })
+        setItem({
+          item: null,
+          quantity: 1,
+          rate: "",
+          discount: "",
+        })
+        router.back()
       }
     } catch (err) {
-      showToast({
-        message: "Error creating invoice",
-        type: "error",
-      });
+      showToast({ message: "Error creating invoice", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
+  /* ------------------------------ Subtotal ------------------------------ */
+  const subTotal = invoiceItems
+    .reduce(
+      (acc, i) =>
+        acc + i.qty * i.rate - (i.qty * i.rate * i.discount) / 100,
+      0
+    )
+    .toFixed(2);
+
+  /* ------------------------------ UI ------------------------------ */
   return (
     <>
       <div className="flex justify-between mb-6">
         <PageBreadcrumb pageTitle="Create Invoice" />
       </div>
-      <Form onSubmit={(e, payload) => {
-        e.preventDefault();
-        submitInvoice(payload);
-      }} className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-          {/* ---------------- FORM HEADER ---------------- */}
-        <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-800">
-          <h2 className="text-xl font-medium text-gray-800 dark:text-white">
-            Create Invoice
-          </h2>
+
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitInvoice();
+        }}
+        className="rounded-2xl border border-gray-200 bg-white dark:bg-white/[0.03]"
+      >
+        {/* ---------------- HEADER ---------------- */}
+        <div className="border-b px-6 py-4">
+          <CustomSelect
+            label="Invoice No."
+            value={{ label: invoiceNo, value: invoiceNo }}
+            options={
+              invoiceNoData?.missing_numbers?.map((m) => ({
+                label: m,
+                value: m,
+              })) || []
+            }
+            onChange={(v) => setInvoiceNo(v?.value)}
+          />
         </div>
+
         {/* ---------------- BASIC INFO ---------------- */}
-        <div className="border-b border-gray-200 p-4 sm:p-8 dark:border-gray-800">
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <CustomSelect label="Invoice Type" name="invoice_type" options={invoiceTypeOptions} required />
+        <div className="border-b p-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-            <CustomSelect label="Supply Type" name="supply_type" options={supplyTypeOptions} required />
+            <CustomSelect
+              label="Invoice Type"
+              name="invoice_type"
+              options={invoiceTypeOptions}
+              required
+              value={formPayload.invoice_type}
+              onChange={(v) => updateForm("invoice_type", v)}
+            />
 
-            <InputField type="date" id="date" name="date" label="Date" required />
+            <CustomSelect
+              label="Supply Type"
+              name="supply_type"
+              options={supplyTypeOptions}
+              required
+              value={formPayload.supply_type}
+              onChange={(v) => updateForm("supply_type", v)}
+            />
 
-            <InputField id="invoice_number" name="invoice_number" label="Invoice Number" placeholder="WP-3434434" />
+            <InputField
+              type="date"
+              label="Date"
+              name="invoice_date"
+              required
+              value={formPayload.invoice_date}
+              onChange={(e) => updateForm("invoice_date", e.target.value)}
+            />
 
-            <InputField type="textarea" id="notes" name="notes" label="Notes" rows="7" />
+            <CustomSelect
+              label="Bill To"
+              name="contact"
+              loadOptions={loadContactOptions}
+              defaultOptions
+              required
+              value={formPayload.contact}
+              onChange={(v) => updateForm("contact", v)}
+            />
 
-            <InputField type="textarea" id="internal_note" name="internal_note" label="Internal Notes" rows="7" />
-         
-            </div>
+            <InputField
+              type="textarea"
+              name="notes"
+              label="Notes"
+              rows="7"
+              value={formPayload.notes}
+              onChange={(e) => updateForm("notes", e.target.value)}
+            />
+
+            <InputField
+              type="textarea"
+              name="internal_note"
+              label="Internal Notes"
+              rows="7"
+              value={formPayload.internal_note}
+              onChange={(e) => updateForm("internal_note", e.target.value)}
+            />
           </div>
         </div>
 
-        <div className="border-b border-gray-200 p-4 sm:p-8 dark:border-gray-800">
-          <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
+        {/* ---------------- ITEM TABLE ---------------- */}
+        <div className="border-b p-8">
+          <div className="rounded-xl border overflow-hidden">
             <div className="custom-scrollbar overflow-x-auto">
-              <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr className="border-b border-gray-100 whitespace-nowrap dark:border-gray-800">
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      S. No.
-                    </th>
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      Products
-                    </th>
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      Quantity
-                    </th>
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      Unit Cost
-                    </th>
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      Discount
-                    </th>
-                    <th className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      Total
-                    </th>
-                    <th className="relative px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
-                      <span className="sr-only">Actions</span>
-                    </th>
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-gray-50">
+                  <tr className="border-b">
+                    <th className="px-5 py-4">S. No.</th>
+                    <th className="px-5 py-4">Product</th>
+                    <th className="px-5 py-4">Qty</th>
+                    <th className="px-5 py-4">Rate</th>
+                    <th className="px-5 py-4">Discount</th>
+                    <th className="px-5 py-4">Total</th>
+                    <th className="px-5 py-4"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
- {invoiceItems.map((item, i) => {
+
+                <tbody>
+                  {invoiceItems.map((i, idx) => {
                     const total =
-                      item.qty * item.rate -
-                      (item.rate * item.qty * item.discount) / 100;
+                      i.qty * i.rate - (i.qty * i.rate * i.discount) / 100;
 
                     return (
- <tr key={i}>
-                    <td
-                      className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                      x-text="idx + 1"
-                    >
-                      {i + 1}
-                    </td>
-                    <td
-                      className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-800 dark:text-white/90"
-                      x-text="product.name"
-                    >
-                     {item.item}
-                    </td>
-                    <td
-                      className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                      x-text="product.quantity"
-                    >
-                     {item.qty}
-                    </td>
-                    <td
-                      className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                      x-text="'$' + product.price"
-                    >
-                     {item.rate}
-                    </td>
-                    <td
-                      className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                      x-text="product.discount + '%' "
-                    >
-                      {item.discount}%
-                    </td>
-                    <td
-                      className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                      x-text="'$' + product.total"
-                    >
-                      {total.toFixed(2)}
-                    </td>
-                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center justify-center">
-
-                        <button
-                          className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
-                           onClick={() =>
+                      <tr key={idx} className="border-b">
+                        <td className="px-5 py-4">{idx + 1}</td>
+                        <td className="px-5 py-4">{i.item}</td>
+                        <td className="px-5 py-4">{i.qty}</td>
+                        <td className="px-5 py-4">{i.rate}</td>
+                        <td className="px-5 py-4">{i.discount}%</td>
+                        <td className="px-5 py-4">{total.toFixed(2)}</td>
+                        <td className="px-5 py-4 text-right">
+                          <button
+                            onClick={() =>
                               setInvoiceItems((prev) =>
-                                prev.filter((_, idx) => idx !== i)
+                                prev.filter((_, id) => id !== idx)
                               )
                             }
-                        >
-                          <TrashBinIcon />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                    )})}
-
-
-                  
-
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            <TrashBinIcon />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
-              <div className="px-5 py-4 text-center text-gray-400">
-                <Button title="Add Item" startIcon={<PlusIcon />} size="sm" variant="outline" onClick={() => setAddItem(true)} />
+              <div className="px-5 py-4 text-center">
+                <Button
+                  title="Add Item"
+                  startIcon={<PlusIcon />}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setAddItem(true)}
+                />
               </div>
             </div>
           </div>
-          {addItem && <div className="mt-5 rounded-xl border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
-            <Form  onSubmit={(e, payload) => {
-                  e.preventDefault();
-                  handleAddItem(payload);
-                }}>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
 
-                
-                <CustomSelect  label="Item"
-                    name="item"
-                    options={itemsOption}
-                    required coverClass="w-full lg:col-span-3" />
+          {/* ---------------- ADD NEW ITEM FORM ---------------- */}
+          {addItem && (
+            <div className="mt-5 border p-6 rounded-xl">
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
+                <CustomSelect
+                  label="Item"
+                  name="item"
+                  loadOptions={loadItemOptions}
+                  defaultOptions
+                  required
+                  value={item.item}
+                  onChange={(v) => updateItemField("item", v)}
+                  coverClass="lg:col-span-3"
+                />
 
                 <InputField
-                  id="rate"
                   type="number"
                   name="rate"
-                  min={0}
                   label="Rate"
-                  stepHidden
-                  placeholder="Enter product Rate"
-                  coverClass="w-full lg:col-span-3"
+                  value={item.rate}
+                  onChange={(e) => updateItemField("rate", e.target.value)}
+                  min={0}
+                  placeholder="Enter Rate"
+                  coverClass="lg:col-span-3"
                 />
-                {/* <div className="w-full lg:col-span-3">
-                  <label className="mb-1 inline-block text-sm font-semibold text-gray-700 dark:text-gray-400">
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Enter product price"
-                    className="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                    required=""
-                  />
-                </div> */}
-                <div className="w-full lg:col-span-2">
-                  {/* <label className="mb-1 inline-block text-sm font-semibold text-gray-700 dark:text-gray-400">
-                    Quantity
-                  </label> */}
-                  <Label htmlFor="qty" label="Quantity" />
-                  <div className="flex h-11 divide-x divide-gray-300 overflow-hidden rounded-lg border border-gray-300 dark:divide-gray-800 dark:border-gray-700">
+
+                <div className="lg:col-span-2">
+                  <Label label="Quantity" />
+                  <div className="flex h-11 divide-x rounded-lg border">
                     <button
                       type="button"
-                      className="inline-flex w-1/3 items-center justify-center bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                      disabled={item.quantity <= 1}
+                      onClick={decrementQty}
+                      className="flex-1"
                     >
                       <MinusIcon />
                     </button>
-                    <div className="w-1/3">
-                      <input
-                        type="number"
-                        min="1"
-                        id="qty"
-                        name="qty"
-                        className="h-full w-full border-0 bg-white text-center text-sm text-gray-700 outline-none focus:ring-0 dark:bg-gray-900 dark:text-gray-400 step-hidden"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className="inline-flex w-1/3 items-center justify-center bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                    >
-                      <PlusIcon size={24} />
+
+                    <input
+                      type="number"
+                      min="1"
+                      className="w-1/3 text-center"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        updateItemField("quantity", e.target.value)
+                      }
+                    />
+
+                    <button type="button" onClick={incrementQty} className="flex-1">
+                      <PlusIcon />
                     </button>
                   </div>
                 </div>
 
+                <CustomSelect
+                  label="Discount"
+                  options={discountOptions}
+                  value={discountOptions.find((d) => d.value === item.discount)}
+                  onChange={(v) => updateItemField("discount", v?.value)}
+                  coverClass="lg:col-span-4"
+                />
 
-                <CustomSelect label="Discount" options={discountOptions} coverClass="w-full lg:col-span-4" />
-                <InputField type="textarea" id="internal_note" label="Internal Notes" placeholder="Internal Notes" rows="7" coverClass="w-full lg:col-span-12" />
-
-                <div className="flex w-full items-end lg:col-span-2">
-                  <Button type="submit" title="Save Product" size="sm" className="w-full" />
+                <div className="flex items-end lg:col-span-2">
+                  <Button
+                    title="Save Product"
+                    className="w-full"
+                    onClick={handleSaveItem}
+                  />
                 </div>
               </div>
-            </Form>
-            <div className="mt-5 flex max-w-2xl items-center gap-2">
 
-              <InfoIcon size={20} className="text-gray-500 dark:text-gray-400" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                After filling in the product details, press Enter/Return or
-                click 'Save Product' to add it to the list.
-              </p>
+              <div className="mt-5 flex items-center gap-2">
+                <InfoIcon size={20} className="text-gray-500" />
+                <p className="text-sm text-gray-500">
+                  Press Enter or click "Save Product"
+                </p>
+              </div>
             </div>
-          </div>}
+          )}
 
+          {/* ---------------- ORDER SUMMARY ---------------- */}
+          <div className="mt-6 flex justify-end">
+            <div className="space-y-2 w-[220px]">
+              <p className="font-medium">Order Summary</p>
 
-          <div className="flex flex-wrap justify-between sm:justify-end">
-            <div className="mt-6 w-full space-y-1 text-right sm:w-[220px]">
-              <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
-                Order summary
-              </p>
-              <ul className="space-y-2">
-                <li className="flex justify-between gap-5">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Sub Total
-                  </span>
-                  <span
-                    className="text-sm font-medium text-gray-700 dark:text-gray-400"
-                    x-text="'$' + subtotal"
-                  >
-                    ₹
-                    {invoiceItems
-                      .reduce(
-                        (acc, item) =>
-                          acc +
-                          item.qty * item.rate -
-                          (item.qty * item.rate * item.discount) / 100,
-                        0
-                      )
-                      .toFixed(2)}
-                  </span>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Vat (10%):
-                  </span>
-                  <span
-                    className="text-sm font-medium text-gray-700 dark:text-gray-400"
-                    x-text="'$' + vat"
-                  >
-                    $385.00
-                  </span>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700 dark:text-gray-400">
-                    Total
-                  </span>
-                  <span
-                    className="text-lg font-semibold text-gray-800 dark:text-white/90"
-                    x-text="'$' + total"
-                  >
-                    $4235.00
-                  </span>
-                </li>
-              </ul>
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>₹ {subTotal}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>VAT (10%)</span>
+                <span>₹ {(subTotal * 0.1).toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between font-semibold text-lg">
+                <span>Total</span>
+                <span>₹ {(subTotal * 1.1).toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>
-        <div className="p-4 sm:p-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button title="Preview Invoice" startIcon={<EyeIcon />} size="sm" variant="outline" />
-            <Button title="Save Invoice" startIcon={<SaveIcon />} size="sm" type="submit" />
-          </div>
+
+        {/* ---------------- ACTION BUTTONS ---------------- */}
+        <div className="p-8 flex justify-end gap-3">
+          <Button title="Preview Invoice" variant="outline" startIcon={<EyeIcon />} />
+          <Button title="Save Invoice" startIcon={<SaveIcon />} type="submit" />
         </div>
       </Form>
-
     </>
   );
 };
 
 export default InvoiceForm;
-// {
-//   "contact": 1,                   // ID of the contact
-//   "invoice_type": "default",      // "default", "delivery_challan", "proforma", or "credit_note"
-//   "supply_type": "regular",       // "regular", "bill_to_ship_to", "bill_from_dispatch_from", "a_party"
-//   "invoice_date": "2025-11-30",
-//   "notes": "This is a test invoice",
-//   "internal_note": "Internal note for accounting",
-//   "items": [
-//     {
-//       "description": "Item 1",
-//       "quantity": 2,
-//       "rate": 500,
-//       "discount": 50
-//     },
-//     {
-//       "description": "Item 2",
-//       "quantity": 1,
-//       "rate": 1000,
-//       "discount": 0
-//     }
-//   ]
-// }

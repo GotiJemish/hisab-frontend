@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { DropdownMenu } from "../ui/dropdown/DropdownMenu";
+import { DropdownItem } from "../ui/dropdown/UiDropdownItem";
 import { useAuth } from "@/context/AuthContext";
 import { ChevronDownIcon, SignOutIcon } from "@/icons";
 
@@ -36,13 +36,12 @@ export default function UserDropdown() {
 
         <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
         <ChevronDownIcon
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "-rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "-rotate-180" : ""
+            }`}
         />
       </button>
 
-      <Dropdown
+      <DropdownMenu
         isOpen={isOpen}
         onClose={closeDropdown}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
@@ -140,7 +139,7 @@ export default function UserDropdown() {
           <SignOutIcon className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300" />
           Log out
         </button>
-      </Dropdown>
+      </DropdownMenu>
     </div>
   );
 }

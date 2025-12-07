@@ -4,6 +4,18 @@ import { handleApiError } from "@/utilities/functions";
 const extractResponse = (response) => response?.data ?? {};
 
 // -----------------------------------------------------
+// GET INVOICE NUMBER
+// -----------------------------------------------------
+export const getInvoiceNumber = async (payload) => {
+  try {
+    const res = await apiClient.get(`/invoices/invoice-number/?date=${payload}`);
+    return extractResponse(res);
+  } catch (error) {
+    handleApiError(error, "Failed to fetch invoice number");
+    throw error;
+  }
+}
+// -----------------------------------------------------
 // GET ALL ITEMS
 // -----------------------------------------------------
 export const getAllInvoices = async () => {

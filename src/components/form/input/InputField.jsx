@@ -9,7 +9,7 @@ const InputField = ({
   id = "",
   name = "",
   placeholder = "",
-  // defaultValue = null,
+  pastDays = null,
   onChange = () => { },
   className = "",
   min,
@@ -24,6 +24,9 @@ const InputField = ({
   coverClass = "",
   hiddenLabel = false,
   stepHidden = false,
+  defaultDate = null,     // <-- NEW
+  allowPast = true,       // <-- NEW
+  allowFuture = true,
   ...rest
 }) => {
   const dateRef = useRef(null);
@@ -33,14 +36,40 @@ const InputField = ({
   useEffect(() => {
     if (type !== "date") return;
 
-    const fp = flatpickr(dateRef.current, {
-      dateFormat: "Y-m-d",
-      // defaultDate: defaultValue,
-      onChange: onChange,
-    });
+    const today = new Date();
 
+    let config = {
+      dateFormat: "d-m-Y",
+      onChange: (selectedDates, dateStr) => {
+        // Ensures the final value is always "YYYY-MM-DD"
+        onChange({ target: { name, value: dateStr } });
+      },
+    };
+
+    // Default Date
+    if (defaultDate === "today") {
+      config.defaultDate = today;
+    } else if (defaultDate) {
+      config.defaultDate = defaultDate;
+    }
+
+    // Past limit
+    if (pastDays !== null) {
+      const pastLimit = new Date();
+      pastLimit.setDate(today.getDate() - pastDays);
+
+      config.minDate = pastLimit;
+      config.maxDate = today;
+    }
+
+    if (allowFuture === false && pastDays === null) {
+      config.maxDate = today;
+    }
+
+    const fp = flatpickr(dateRef.current, config);
     return () => fp.destroy();
-  }, [type, name, onChange]);
+  }, [type, name, onChange, defaultDate, allowPast, allowFuture]);
+
 
   let coverClasses = ` ${coverClass}`;
 
@@ -90,7 +119,10 @@ const InputField = ({
           name={name}
           placeholder={placeholder}
           // defaultValue={defaultValue}
-          onChange={onChange}
+          onChange={type === "date" ? (selectedDates, dateStr) => {
+            onChange({ target: { name, value: dateStr } });
+          }
+            : onChange}
           min={min}
           max={max}
           step={step}
@@ -109,10 +141,10 @@ const InputField = ({
         {hint && (
           <p
             className={`mt-1.5 text-xs ${error
-                ? "text-error-500"
-                : success
-                  ? "text-success-500"
-                  : "text-gray-500"
+              ? "text-error-500"
+              : success
+                ? "text-success-500"
+                : "text-gray-500"
               }`}
           >
             {hint}
