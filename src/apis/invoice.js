@@ -29,6 +29,22 @@ export const getAllInvoices = async () => {
 };
 
 // -----------------------------------------------------
+// GET ITEMS With Pagination
+// -----------------------------------------------------
+export const getInvoices = async (page) => {
+  try {
+    const res = await apiClient.get(`/invoices/?page=${page}`);
+    return extractResponse(res);
+  } catch (error) {
+    handleApiError(error, "Failed to fetch invoices");
+    throw error;
+  }
+};
+
+
+
+
+// -----------------------------------------------------
 // CREATE ITEM
 // -----------------------------------------------------
 export const createInvoice = async (payload) => {

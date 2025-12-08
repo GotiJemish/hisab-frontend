@@ -23,12 +23,13 @@ import {
   getAllItems,
   updateItem,
 } from "@/apis/items";
-import { getAllInvoices } from "@/apis/invoice";
+import { getAllInvoices, getInvoices } from "@/apis/invoice";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const InvoiceModule = () => {
   const { isOpen, openModal, closeModal } = useModal();
+  const [currentPage,setCurrentPage]=useState(1);
   const { loading, setLoading } = useLoading();
   const { showToast } = useToast();
 const path=usePathname()
@@ -49,8 +50,8 @@ const path=usePathname()
   const fetchAllInvoices = async () => {
     try {
       setLoading(true);
-      const res = await getAllInvoices();
-      setInvoices(res?.data ?? []);
+      const res = await getInvoices(currentPage);
+      setInvoices(res?.data?.results ?? []);
     } catch (error) {
       showToast({ message: "Failed to fetch items.", type: "error" });
     } finally {
@@ -78,75 +79,52 @@ const path=usePathname()
   };
 
   const confirmDelete = async () => {
-    const { id } = deleteState;
-    if (!id) return;
+    // const { id } = deleteState;
+    // if (!id) return;
 
-    const prevItems = [...items];
-    setInvoices((prev) => prev.filter((i) => i.id !== id));
+    // const prevItems = [...items];
+    // setInvoices((prev) => prev.filter((i) => i.id !== id));
 
-    try {
-      setLoading(true);
-      const res = await deleteItemApi(id);
+    // try {
+    //   setLoading(true);
+    //   const res = await deleteItemApi(id);
 
-      if (res?.success) {
-        showToast({ message: "Item deleted successfully!", type: "success" });
-        fetchAllInvoices();
-      }
-    } catch (error) {
-      setInvoices(prevItems);
-      showToast({ message: "Failed to delete item.", type: "error" });
-    } finally {
-      setLoading(false);
-      setDeleteState({ isConfirm: false, id: null });
-    }
+    //   if (res?.success) {
+    //     showToast({ message: "Item deleted successfully!", type: "success" });
+    //     fetchAllInvoices();
+    //   }
+    // } catch (error) {
+    //   setInvoices(prevItems);
+    //   showToast({ message: "Failed to delete item.", type: "error" });
+    // } finally {
+    //   setLoading(false);
+    //   setDeleteState({ isConfirm: false, id: null });
+    // }
   };
-
+    /** ---------------------------
+     * FETCH INVOICES
+     * -------------------------- */
+//       const fetchInvoices = async () => {
+//         try {
+//           setLoading(true);
+//           const data = await getAllInvoices();
+//           setInvoices(data?.data || []);
+//         } catch (error) {
+//           setLoading(false);
+//           showToast({
+//             message: "Failed to fetch invoices.",
+//             type: "error",
+//           });
+//         } finally {
+//           setLoading(false);
+//         }
+//       };
+// useEffect(()=>{
+//    fetchInvoices();
+// },[])
   // --------------------------------------------------------------------
   // useActionState SUBMIT HANDLER
   // --------------------------------------------------------------------
-  const submitItem = async (prevState, payload) => {
-    const isEdit = !!payload.id;
-    const previous = [...items];
-
-    try {
-      setLoading(true);
-
-      // OPTIMISTIC UPDATE
-      setInvoices((prev) =>
-        isEdit
-          ? prev.map((i) => (i.id === payload.id ? { ...i, ...payload } : i))
-          : [...prev, { ...payload, id: Date.now() }]
-      );
-
-      // API REQUEST
-      const res = isEdit
-        ? await updateItem(payload.id, payload)
-        : await createItem(payload);
-
-      if (res?.success) {
-        fetchAllInvoices();
-      }
-
-      showToast({
-        message: isEdit ? "Item updated!" : "Item added!",
-        type: "success",
-      });
-
-      closeModal();
-
-      return { success: true };
-    } catch (err) {
-      setInvoices(previous);
-      showToast({
-        message: "Failed to save item.",
-        type: "error",
-      });
-      return { success: false };
-    } finally {
-      setEditableItem({ isEdit: false, data: null });
-      setLoading(false);
-    }
-  };
 
 
 
@@ -390,7 +368,7 @@ const path=usePathname()
           <CustomTable
             isSelectable
             coverClass="border-0"
-            data={[]}
+            data={invoice}
             columns={MAIN_TABLE_COLUMNS}
             hasActions
             hasmultipleActions

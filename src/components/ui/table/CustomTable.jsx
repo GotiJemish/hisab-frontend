@@ -41,6 +41,7 @@ coverClass="",
   selectedIds = [],
   onToggle = () => {},
   onStatusChange = () => {},
+  pagination={}
 }) => {
   const {
     // table style
@@ -70,6 +71,7 @@ coverClass="",
     onDelete = () => {},
     hasmultipleActions = false,
   } = action;
+  const {page=1,limit=10}=pagination;
   const [editingCell, setEditingCell] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
